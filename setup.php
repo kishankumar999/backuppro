@@ -1,6 +1,23 @@
 <?php
 $error = false;
+$error_not_writable = false;
 $configFilePath = 'config.php';
+
+$currentFolder = __DIR__;
+$writable = is_writable($currentFolder);
+$platform = PHP_OS;
+
+if (!$writable) {
+    if (strpos($platform, 'WIN') === 0) {
+        // Windows platform
+        $instructions = "To make the current folder writable, open Command Prompt or PowerShell as an administrator and run: \n\n";
+        $instructions .= "<div class='my-2'><code>icacls \"$currentFolder\" /grant Users:(F)</code></div>";
+    } else {
+        // Non-Windows platform (e.g., Linux, macOS)
+        $instructions = "To make the current folder writable, open a terminal and run: \n\n";
+        $instructions .= "<div class='my-2'><code>chmod -R 777 \"$currentFolder\"</code></div>";
+    }
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Step 1: Process the form submission
@@ -13,10 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $setupName = $_POST['setup_name'];
 
     // Step 2: Check if the database credentials are valid
-    try{
-        $connection = @mysqli_connect($dbHost, $dbUsername, $dbPassword, $dbName) ;
-    }
-    catch(Exception $e){
+    try {
+        $connection = @mysqli_connect($dbHost, $dbUsername, $dbPassword, $dbName);
+    } catch (Exception $e) {
         $error = true;
     }
 
@@ -58,6 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $configContent = "<?php\n\nreturn " . var_export($config, true) . ";\n";
 
+        
         // Step 4: Write the config file to disk
         if (file_put_contents($configFilePath, $configContent) !== false) {
             // Step 5: Installation successful
@@ -65,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         } else {
             // Handle the error case
-            $error = true;
+            $error_not_writable = true;
         }
     }
 }
@@ -82,11 +99,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body class="bg-gray-100 p-10">
-    <div class="container max-w-xl bg-white px-10  mx-auto py-10 " >
+    <div class="container max-w-xl bg-white px-10  mx-auto py-10 ">
         <h1 class="text-2xl mb-5">BackupPro Installation</h1>
+        <?php if (!$writable) : ?>
+            <div class="bg-yellow-300 text-black my-5 px-4 py-2">
+                <p class="text-lg my-2">Make BackupPro folder writeable </p>
+                <p><?php echo $instructions; ?></p>
+            </div>
+        <?php endif; ?>
         <?php if ($error) : ?>
             <div class="bg-red-200 text-red-800 p-3 my-5">
                 Error occurred during installation. Please check your database credentials and try again.
+            </div>
+        <?php endif; ?>
+        <?php if ($error_not_writable) : ?>
+            <div class="bg-red-200 text-red-800 p-3 my-5">
+                Could not write the config file. Please make sure the current folder is writable.
             </div>
         <?php endif; ?>
         <p>
@@ -98,11 +126,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>
             Please provide the following information. Don't worry, you can always change these settings later.
         </p>
-        
+
         <form method="post" action="" class="max-w-sm">
-        <h2 class="text-xl mb-2 mt-10">Database connection</h2>
-        <p class="mb-5">Below you should enter your database connection details. If you're not sure about these, contact your host.</p>
-       
+            <h2 class="text-xl mb-2 mt-10">Database connection</h2>
+            <p class="mb-5">Below you should enter your database connection details. If you're not sure about these, contact your host.</p>
+
             <div class="mb-5">
                 <label for="db_host" class="block mb-2">Database Host:</label>
                 <input type="text" id="db_host" name="db_host" required class="border border-gray-300 p-2 w-full">
@@ -120,8 +148,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="password" id="db_password" name="db_password" class="border border-gray-300 p-2 w-full">
             </div>
 
-            <h2 class="text-xl mb-5 mt-10"> Admin Credentials</h2>
-            <p class="mb-5">Below you should enter your details of your Admin Login that you would use to securely login to your dashboard.</p>
+            <h2 class="text-xl mb-5 mt-10"> New Admin Credentials</h2>
+            <p class="mb-5">Below you should enter your details of your Admin Login 
+                that you would use to securely login to your BackupPro dashboard.</p>
             <div class="mb-5">
                 <label for="dashboard_username" class="block mb-2"> Username:</label>
                 <input type="text" id="dashboard_username" name="dashboard_username" required class="border border-gray-300 p-2 w-full">
