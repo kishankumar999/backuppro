@@ -42,9 +42,32 @@ $zip->open($zipFile, ZipArchive::CREATE);
 $zip->addFile($backupFile);
 $zip->close();
 
+function generateBackupFileName($template) {
+    $currentDate = date('Y-m-d');
+    // current time in 12 hour format with AM/PM separated by - 
+    $currentTime = date('h-i-sA');
+    // getting datbase name from config.php
+    $config = include('config.php');
+    $databaseName = $config['db_name'];
+
+    // Replace placeholders in the template with actual values
+    $backupFileName = str_replace('{date}', $currentDate, $template);
+    $backupFileName = str_replace('{time}', $currentTime, $backupFileName);
+    $backupFileName = str_replace('{database_name}', $databaseName, $backupFileName);
+
+    return $backupFileName . '.zip'; // Add .zip extension to the file name
+}
+
+// Example usage:
+// get template from config
+$template = $config['backup_file_name'];
+$backupFileName = generateBackupFileName($template);
+// echo $backupFileName;
+
+
 // Set headers for download
 header('Content-Type: application/zip');
-header('Content-Disposition: attachment; filename="' . basename($zipFile) . '"');
+header('Content-Disposition: attachment; filename="' . $backupFileName . '"');
 header('Content-Length: ' . filesize($zipFile));
 
 // Output the zip file for download

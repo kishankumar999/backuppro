@@ -31,8 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Step 2: Check if the database credentials are valid
     try {
+
         $connection = @mysqli_connect($dbHost, $dbUsername, $dbPassword, $dbName);
     } catch (Exception $e) {
+        // display exception
+        echo $e->getMessage();
+        echo $dbHost;
+        echo $dbName;
+        echo $dbUsername;
+        echo $dbPassword;
         $error = true;
     }
 
@@ -46,7 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'db_password' => $dbPassword,
             'dashboard_username' => $dashboardUsername,
             'dashboard_password' => $dashboardPassword,
-            'setup_name' => $setupName
+            'setup_name' => $setupName,
+            'backup_folder' => 'backups',
+            'backup_file_name' => '{database_name}-{date}-{time} '
         );
 
         // Step 3.5: Find mysqldump path

@@ -209,12 +209,65 @@ flush(); // Send the HTML content to the browser immediately
 // Upload zip file to Google Drive
 $service = new Google_Service_Drive($client);
 
+
+function generateBackupFileName($template) {
+    $currentDate = date('Y-m-d');
+    // current time in 12 hour format with AM/PM separated by - 
+    $currentTime = date('h-i-sA');
+    // getting datbase name from config.php
+    $config = include('config.php');
+    $databaseName = $config['db_name'];
+
+    // Replace placeholders in the template with actual values
+    $backupFileName = str_replace('{date}', $currentDate, $template);
+    $backupFileName = str_replace('{time}', $currentTime, $backupFileName);
+    $backupFileName = str_replace('{database_name}', $databaseName, $backupFileName);
+
+    return $backupFileName . '.zip'; // Add .zip extension to the file name
+}
+
+// Example usage:
+// get template from config
+$template = $config['backup_file_name'];
+$backupFileName = generateBackupFileName($template);
+
 // Create a file metadata
-$fileMetadata = new Google_Service_Drive_DriveFile(array(
-    'name' => 'backup.zip'
-));
+
 
 // Set the parent folder ID if necessary
+
+// find folder id from name in root if exists in drive else create new folder
+$folderName = $config['folder_name'];
+$folderId = null;
+$optParams = array(
+    'q' => "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false",
+    'fields' => 'files(id, name)'
+);
+$results = $service->files->listFiles($optParams);
+
+if (count($results->getFiles()) == 0) {
+    // create folder directly under the root directory (no parent folder)
+    $fileMetadata = new Google_Service_Drive_DriveFile(array(
+        'name' => $folderName,
+        'mimeType' => 'application/vnd.google-apps.folder'
+    ));
+    $file = $service->files->create($fileMetadata, array(
+        'fields' => 'id'
+    ));
+    $folderId = $file->id;
+} else {
+    $folderId = $results->getFiles()[0]->getId();
+}
+
+
+$fileMetadata = new Google_Service_Drive_DriveFile(array(
+    'name' => $backupFileName
+));
+$fileMetadata->setParents(array($folderId));
+
+
+
+
 // $fileMetadata->setParents(array('folderId'));
 
 // Specify the MIME type of the file

@@ -21,6 +21,7 @@ $config = include('config.php');
             <li><a href="dashboard.php" class="text-blue-500">Dashboard</a></li>
             <li><a href="schedule.php" class="text-blue-500">Automate Backup</a></li>
             <li><a href="setup_drive.php" class="text-blue-500">Setup Drive</a></li>
+            <li><a href="drive_settings.php" class="text-blue-500">Drive Settings</a></li>
             <li><a href="db_settings.php" class="text-blue-500">DB Settings</a></li>
             <li><a href="reset_password.php" class="text-blue-500">Reset Password</a></li>
             <li><a href="reset.php" class="text-blue-500">Reset BackupPro</a></li>

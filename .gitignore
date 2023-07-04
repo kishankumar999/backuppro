@@ -1,0 +1,10 @@
+# Ignoring vendor
+vendor/
+# Ignore uploads uploads/*.json
+uploads/*.json
+# Ignore uploads uploads/*.json
+token.json
+# ignore config.php
+config.php
+
+```
