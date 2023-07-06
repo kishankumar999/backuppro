@@ -7,28 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
-
-
-
 </head>
 
-<body class="flex flex-col md:flex-row min-h-screen">
-    <!-- BackupPro Title -->
-    <div class="w-full md:w-1/5 bg-gray-800 text-white flex-shrink-0 p-4">
-        <h2 class="text-2xl font-bold mb-4">
-            <a href="dashboard.php" class="text-white">BackupPro</a>
-        </h2>
-        <ul class="space-y-2">
-            <li><a href="dashboard.php" class="text-blue-500">Dashboard</a></li>
-            <li><a href="reset_password.php" class="text-blue-500">Reset Password</a></li>
-            <li><a href="logout.php" class="text-blue-500">Logout</a></li>
-            <li><a href="db_settings.php" class="text-blue-500">DB Settings</a></li>
-            <li><a href="setup_drive.php" class="text-blue-500">Setup Drive</a></li>
-        </ul>
-    </div>
+<body class="bg-gray-50">
+   
+ <!-- include tabs -->
+    <?php include 'drive_tabs.php'; ?>
 
     <!-- Content -->
-    <div class="w-full md:w-4/5 p-8 prose">
+    <div class="max-w-xl mx-auto   bg-white p-8 ">
         <h2 class="title text-2xl text-bold mb-5">Getting Started</h2>
 
         <p>To allow your visitors to log in with their Google account, first you must create a Google App. The following guide will help you through the Google App creation process. </p>
@@ -44,6 +31,8 @@
             <!-- enable google drive api -->
             <li class="mb-4">Click on the "<b>Enable APIs and Services</b>" button.</li>
             <li class="mb-4">Search for "<b>Google Drive API</b>" and click on it.</li>
+            <li class="mb-4">Click on the "<b>Enable</b>" button.</li>
+            <li class="mb-4">Search for "<b>Gmail API</b>" and click on it.</li>
             <li class="mb-4">Click on the "<b>Enable</b>" button.</li>
             
             <li class="mb-4">Name your project and then click on the "<b>Create</b>" button again!</li>

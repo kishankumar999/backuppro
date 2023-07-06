@@ -30,8 +30,13 @@ $backupTime = isset($config['backup_time']) ? $config['backup_time'] : '';
     <title>Backup Frequency Setup</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-200">
-    <div class="container mx-auto p-4 bg-white rounded-xl shadow-xl max-w-xl my-10">
+<body class="bg-gray-50">
+   
+ <!-- include tabs -->
+    <?php include 'drive_tabs.php'; ?>
+
+    <!-- Content -->
+    <div class="max-w-xl mx-auto   bg-white p-8">
         <h2 class="text-2xl font-bold mb-4">Backup Frequency Setup</h2>
         <?php if ($successMessage !== ''): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
@@ -52,12 +57,11 @@ $backupTime = isset($config['backup_time']) ? $config['backup_time'] : '';
                 <input type="time" id="backup_time" name="backup_time" value="<?= $backupTime ?>" class="border rounded-md py-2 px-3 w-full">
             </div>
             <div class="flex justify-between items-center">
-                <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded">Save</button>
-                <a href="dashboard.php" class="text-blue-500 underline">Back to Dashboard</a>
+                <button type="submit" class="bg-green-500 w-full text-white py-2 px-4 rounded">Save</button>
             </div>
         </form>
     </div>
-    <div class="container mx-auto p-10 my-10 bg-white rounded shadow-xl max-w-xl">
+    <div class="max-w-xl mx-auto   bg-white p-8 my-10">
         <h1 class="text-2xl font-bold mb-6">Cron Job Setup Instructions</h1>
         <div class="mb-10">
             <label class="block font-bold mb-2" for="platform">Platform:</label>
@@ -109,9 +113,7 @@ $backupTime = isset($config['backup_time']) ? $config['backup_time'] : '';
             </div>
         </div>
 
-        <div class="flex items-center justify-between">
-            <a class="text-blue-500 hover:text-blue-600 font-bold" href="dashboard.php">Back to Dashboard</a>
-        </div>
+        
     </div>
 
     <script>
@@ -132,6 +134,14 @@ $backupTime = isset($config['backup_time']) ? $config['backup_time'] : '';
                 }
             });
         });
+
+        // on page load 
+        addEventListener('load', function() {
+           // trigger 
+              platformSelect.dispatchEvent(new Event('change'));
+        });
+
+        
     </script>
 </body>
 </html>

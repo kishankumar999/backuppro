@@ -12,23 +12,12 @@
 
 </head>
 
-<body class="flex flex-col md:flex-row min-h-screen">
-    <!-- BackupPro Title -->
-    <div class="w-full md:w-1/5 bg-gray-800 text-white flex-shrink-0 p-4">
-        <h2 class="text-2xl font-bold mb-4">
-            <a href="dashboard.php" class="text-white">BackupPro</a>
-        </h2>
-        <ul class="space-y-2">
-            <li><a href="dashboard.php" class="text-blue-500">Dashboard</a></li>
-            <li><a href="reset_password.php" class="text-blue-500">Reset Password</a></li>
-            <li><a href="logout.php" class="text-blue-500">Logout</a></li>
-            <li><a href="db_settings.php" class="text-blue-500">DB Settings</a></li>
-            <li><a href="setup_drive.php" class="text-blue-500">Setup Drive</a></li>
-        </ul>
-    </div>
-
+<body class="bg-gray-50">
+   
+ <!-- include tabs -->
+    <?php include 'drive_tabs.php'; ?>
     <!-- Content -->
-    <div class="w-full md:w-4/5 p-8 prose">
+    <div class="max-w-xl mx-auto   prose bg-white ">
     <?php
 // Check if the form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['credentials'])) {
