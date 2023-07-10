@@ -35,6 +35,29 @@ $backupTime = isset($config['backup_time']) ? $config['backup_time'] : '';
  <!-- include tabs -->
     <?php include 'drive_tabs.php'; ?>
 
+ <?php 
+// if windows platform
+if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    ?>
+
+    <!-- flowbite button -->
+    <div class="flex flex-col justify-center max-w-xl mx-auto items-center  gap-5 bg-white p-8 mb-10">
+        <!-- Windows Logo  -->
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Windows_logo_-_2012.svg/1200px-Windows_logo_-_2012.svg.png" alt="Windows Logo" width="50" height="50">
+       <!-- muted text tailwind -->
+       <div class="flex flex-col justify-center gap-3">
+
+           <p class="text-gray-400 text-sm">We detected your are running BackupPro on Windows Server.</p>
+           <a href="windows_scheduler.php" class=" inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+               Set up Automated Backup on Windows. 
+            </a>
+        </div>
+    </div>
+
+    <?php
+} 
+?>
+
     <!-- Content -->
     <div class="max-w-xl mx-auto   bg-white p-8">
         <h2 class="text-2xl font-bold mb-4">Backup Frequency Setup</h2>

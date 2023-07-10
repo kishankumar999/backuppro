@@ -1,5 +1,8 @@
 <?php
-include 'validate_login.php'; 
+if(!isset($dont_check_login) || $dont_check_login != true)
+{
+    include __DIR__ . DIRECTORY_SEPARATOR . 'validate_login.php'; 
+}
 // header('Content-Length: ' . ob_get_length());
 // Send the HTTP headers for chunked encoding
 
@@ -23,54 +26,40 @@ ob_implicit_flush(true);
 // ini_set('display_errors', 1);
 // Include the necessary Google API files
 // include your composer dependencies
-require_once 'vendor/autoload.php';
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
 // Include the config file
-$config = include('config.php');
+$config = include(__DIR__ . DIRECTORY_SEPARATOR . 'config.php');
 
 // Set up the Google API client
 $client = new Google_Client();
 $client->setApplicationName('BackupPro');
 $client->setScopes(Google_Service_Drive::DRIVE);
-$client->setAuthConfig($config['client_secret']);
+$client->addScope(Google_Service_Gmail::GMAIL_SEND);
+$client->setAuthConfig(__DIR__ . DIRECTORY_SEPARATOR. $config['client_secret']);
 $client->setAccessType('offline');
 $client->setPrompt('select_account consent');
 
-
-$currentURL = 'http';
-if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-    $currentURL .= 's';
-}
-$currentURL .= '://' . $_SERVER['HTTP_HOST'];
-
-// Parse the URL and remove the query parameters
-$urlParts = parse_url($_SERVER['REQUEST_URI']);
-$path = $urlParts['path'];
-$query = isset($urlParts['query']) ? '' : '';
-
-// Rebuild the URL without the query parameters
-$currentURL .= $path;
-
 //echo $currentURL; 
   //  exit; 
-$client->setRedirectUri($currentURL);
+$client->setRedirectUri($config['redirect_url']);
 
 
 if (isset($_GET['code'])) {
     $token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
     $client->setAccessToken($token);
-    file_put_contents('token.json', json_encode($client->getAccessToken()));
+    file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . 'token.json', json_encode($client->getAccessToken()));
 }
 
 
 // Authorize the client
 if (!$client->isAccessTokenExpired()) {
     // Save the access token for future use
-    file_put_contents('token.json', json_encode($client->getAccessToken()));
+    file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . 'token.json', json_encode($client->getAccessToken()));
 }
 
 // Check if token already exists
-if (file_exists('token.json')) {
-    $accessToken = json_decode(file_get_contents('token.json'), true);
+if (file_exists(__DIR__ . DIRECTORY_SEPARATOR .'token.json')) {
+    $accessToken = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'token.json'), true);
     $client->setAccessToken($accessToken);
 } else {
     // Redirect the user to the authorization URL
@@ -78,6 +67,7 @@ if (file_exists('token.json')) {
     header('Location: ' . $authUrl);
     exit();
 }
+
 
 // MySQL database credentials
 $dbHost = $config['db_host'];
@@ -88,8 +78,8 @@ $dbName = $config['db_name'];
 // Path of mysqldumps
 $pathOfMysqlDump = $config['mysqldump_path'];
 // Backup file name and path
-$backupFile = 'backup.sql';
-$zipFile = 'backup.zip';
+$backupFile = __DIR__ . DIRECTORY_SEPARATOR .'backup.sql';
+$zipFile = __DIR__ . DIRECTORY_SEPARATOR .'backup.zip';
 ?>
 
 <!DOCTYPE html>
@@ -215,7 +205,7 @@ function generateBackupFileName($template) {
     // current time in 12 hour format with AM/PM separated by - 
     $currentTime = date('h-i-sA');
     // getting datbase name from config.php
-    $config = include('config.php');
+    $config = include(__DIR__ . DIRECTORY_SEPARATOR . 'config.php');
     $databaseName = $config['db_name'];
 
     // Replace placeholders in the template with actual values
@@ -237,6 +227,10 @@ $backupFileName = generateBackupFileName($template);
 // Set the parent folder ID if necessary
 
 // find folder id from name in root if exists in drive else create new folder
+
+// if isset folder name and not blank
+if(isset($config['folder_name']) && !empty($config['folder_name']))
+{
 $folderName = $config['folder_name'];
 $folderId = null;
 $optParams = array(
@@ -259,11 +253,15 @@ if (count($results->getFiles()) == 0) {
     $folderId = $results->getFiles()[0]->getId();
 }
 
+}
 
 $fileMetadata = new Google_Service_Drive_DriveFile(array(
     'name' => $backupFileName
 ));
-$fileMetadata->setParents(array($folderId));
+if(isset($folderId) && !empty($folderId))
+{
+    $fileMetadata->setParents(array($folderId));
+}
 
 
 
@@ -274,7 +272,7 @@ $fileMetadata->setParents(array($folderId));
 $fileMimeType = 'application/zip';
 
 // Set the file content
-$fileContent = file_get_contents($zipFile);
+$fileContent = file_get_contents( $zipFile);
 
 // Create the file
 $file = $service->files->create($fileMetadata, array(
@@ -290,9 +288,184 @@ $fileId = $file->id;
 // Generate the download URL
 $downloadUrl = 'https://drive.google.com/uc?export=download&id=' . $fileId;
 
+
+// update status sending notification email
+echo '<script>
+        updateProgressBar(100);
+        updateStatusText("Sending notication email...  ");
+    </script>';
+ob_flush(); // Flush the output buffer
+flush(); // Send the HTML content to the browser immediately
+
+
+
+// Create a file metadata
+
+
+// Set the parent folder ID if necessary
+
+// find folder id from name in root if exists in drive else create new folder
+
+// if isset folder name and not blank
+if(isset($config['folder_name']) && !empty($config['folder_name']))
+{
+$folderName = $config['folder_name'];
+$folderId = null;
+$optParams = array(
+    'q' => "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false",
+    'fields' => 'files(id, name)'
+);
+$results = $service->files->listFiles($optParams);
+
+if (count($results->getFiles()) == 0) {
+    // create folder directly under the root directory (no parent folder)
+    $fileMetadata = new Google_Service_Drive_DriveFile(array(
+        'name' => $folderName,
+        'mimeType' => 'application/vnd.google-apps.folder'
+    ));
+    $file = $service->files->create($fileMetadata, array(
+        'fields' => 'id'
+    ));
+    $folderId = $file->id;
+} else {
+    $folderId = $results->getFiles()[0]->getId();
+}
+
+}
+
+$fileMetadata = new Google_Service_Drive_DriveFile(array(
+    'name' => $backupFileName
+));
+if(isset($folderId) && !empty($folderId))
+{
+    $fileMetadata->setParents(array($folderId));
+}
+
+
+
+
+// $fileMetadata->setParents(array('folderId'));
+
+// Specify the MIME type of the file
+$fileMimeType = 'application/zip';
+
+// Set the file content
+$fileContent = file_get_contents( $zipFile);
+
+// Create the file
+$file = $service->files->create($fileMetadata, array(
+    'data' => $fileContent,
+    'mimeType' => $fileMimeType,
+    'uploadType' => 'multipart',
+    'fields' => 'id'
+));
+
+// Get the file ID
+$fileId = $file->id;
+
+// Generate the download URL
+$downloadUrl = 'https://drive.google.com/uc?export=download&id=' . $fileId;
+
+
+// update status sending notification email
+echo '<script>
+        updateProgressBar(100);
+        updateStatusText("Sending notication email...  ");
+    </script>';
+ob_flush(); // Flush the output buffer
+flush(); // Send the HTML content to the browser immediately
+
+
+
+
+
+
+
+$service = new Google_Service_Gmail($client);
+
+// Read subscribers from subscriber.json file
+$subscribers = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'subscribers.json'), true);
+
+// Check if subscribers exist
+if (!empty($subscribers)) {
+    // Loop through subscribers
+    foreach ($subscribers as $subscriber) {
+        $name = $subscriber['name'];
+        $email = $subscriber['email'];
+
+        // Create a new message
+        $message = new Google_Service_Gmail_Message();
+        $rawMessage = "From: shishir.raven@gmail.com\r\n";
+        $rawMessage .= "To: $email\r\n";
+
+        // Pick email template from email.html file and replace the placeholders with actual values {name},{email},{backup-time},{backup-location},{backup-size}, and extract subject and body
+        $emailTemplate = file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'email.html');
+        // Get subject in subject tag
+        $subject = '';
+        if (preg_match('/<subject>(.*?)<\/subject>/s', $emailTemplate, $matches)) {
+            $subject = $matches[1];
+        }
+        // Remove subject; the rest of the email template is the body
+        $emailTemplate = preg_replace('/<subject>(.*?)<\/subject>/s', '', $emailTemplate);
+        // Replace placeholders with actual values
+        $backupSize = round(filesize($zipFile) / 1024 / 1024, 2) . ' MB';
+
+        // Backup location is folder name and file name
+        if (isset($folderName) && !empty($folderName)) {
+            $backupLocation = $folderName . '/' . $backupFileName;
+        } else {
+            $backupLocation = $backupFileName;
+        }
+
+        $emailTemplate = str_replace('{name}', $name, $emailTemplate);
+        $emailTemplate = str_replace('{email}', $email, $emailTemplate);
+        $emailTemplate = str_replace('{backup-time}', date('Y-m-d h:i:s A'), $emailTemplate);
+        $emailTemplate = str_replace('{backup-location}', $backupLocation, $emailTemplate);
+        $emailTemplate = str_replace('{backup-size}', $backupSize, $emailTemplate);
+
+        // Replace body in email template
+        $body = $emailTemplate;
+
+        // Add subject and body to raw message
+        $rawMessage .= "Subject: =?utf-8?B?" . base64_encode($subject) . "?=\r\n";
+        $rawMessage .= "MIME-Version: 1.0\r\n";
+        $rawMessage .= "Content-Type: text/html; charset=utf-8\r\n";
+        $rawMessage .= "Content-Transfer-Encoding: base64\r\n\r\n";
+        $rawMessage .= chunk_split(base64_encode($body));
+
+        // Encode the message
+        $encodedMessage = rtrim(strtr(base64_encode($rawMessage), '+/', '-_'), '=');
+        $message->setRaw($encodedMessage);
+
+        try {
+            // Send the message
+            $service->users_messages->send('me', $message);
+            echo "Notification sent to $email successfully.<br>";
+        } catch (Google_Service_Exception $e) {
+            echo "Error sending notification to $email: " . $e->getMessage() . "<br>";
+        } catch (Google_Exception $e) {
+            echo "Error sending notification to $email: " . $e->getMessage() . "<br>";
+        }
+    }
+} else {
+    echo "No subscribers found.";
+}
+
+
+
+
+
+
+
+
+
+
 // remvoing files 
 unlink($backupFile);
 unlink($zipFile);
+
+
+
 
 echo '<script>
         updateProgressBar(100);

@@ -46,6 +46,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Step 3: Generate the config file content
     if (!$error) {
 
+        
+$currentURL = 'http';
+if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+    $currentURL .= 's';
+}
+$currentURL .= '://' . $_SERVER['HTTP_HOST'];
+
+// Parse the URL and remove the query parameters
+$urlParts = parse_url($_SERVER['REQUEST_URI']);
+$path = $urlParts['path'];
+$query = isset($urlParts['query']) ? '' : '';
+
+// replace current file name with 
+$path = str_replace('setup.php', 'backup_drive.php', $path);
+
+// Rebuild the URL without the query parameters
+$currentURL .= $path;
+
         $config = array(
             'db_host' => $dbHost,
             'db_name' => $dbName,
@@ -55,7 +73,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'dashboard_password' => $dashboardPassword,
             'setup_name' => $setupName,
             'backup_folder' => 'backups',
-            'backup_file_name' => '{database_name}-{date}-{time} '
+            'backup_file_name' => '{database_name}-{date}-{time}',
+            'redirect_url' => $currentURL 
         );
 
         // Step 3.5: Find mysqldump path

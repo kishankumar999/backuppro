@@ -1,7 +1,12 @@
 <?php
+
+
 $taskName = "MyScheduledTask";
+
+
+
 $cronScriptPath = __DIR__ . "/cron.php"; // Assuming cron.php is in the same folder as this script
-$cronSchedule = "*/5 * * * *"; // Schedule to run every 5 minutes
+$cronSchedule = "*/20 * * * *"; // Schedule to run every 20 minutes
 
 // Get the path to php.exe
 $phpPath = exec("where php");
@@ -29,14 +34,25 @@ exec($command, $output, $returnVar);
 
 if ($returnVar === 0) {
     $existingTaskOutput = implode("\n", $output);
-    if (strpos($existingTaskOutput, $existingTaskCommand) !== false) {
-        echo "A scheduled task with the same command already exists.";
-        exit;
-    }
+   // if (strpos($existingTaskOutput, $existingTaskCommand) !== false) {
+        echo $existingTaskOutput;
+        // Remove the previous task if it exists
+        $removeCommand = "\"$schtasksPath\" /Delete /TN \"$taskName\" /F";
+        exec($removeCommand);
+
+        // Check the return value to determine if the task was successfully removed
+        if ($returnVar === 0) {
+            echo "Previous scheduled task removed successfully.";
+        } elseif ($returnVar === 1) {
+            echo "No previous scheduled task found.";
+        } else {
+            echo "Failed to remove previous scheduled task.";
+        }
+  //  }
 }
 
 // Construct the command to create the scheduled task
-$command = "\"$schtasksPath\" /Create /TN \"$taskName\" /TR \"$phpPath $cronScriptPath\" /SC MINUTE /MO 5";
+$command = "\"$schtasksPath\" /Create /TN \"$taskName\" /TR \"$phpPath -f $cronScriptPath\" /SC MINUTE /MO 20 /IT";
 
 // Execute the command
 exec($command, $output, $returnVar);

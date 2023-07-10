@@ -1,15 +1,90 @@
-<subject>Backup Notification </subject>
+<subject>Backup Notification 007</subject>
 
-<subject>Backup Notification for Shsihir</subject>
-
-<p>Dear {name},</p>
-<p>We are pleased to inform you that a backup of your files has been created.</p>
-<p>Backup details:</p>
-<ul>
-    <li>Email: {email}</li>
-    <li>Backup Time: {backup-time}</li>
-    <li>Backup Location: {backup-location}</li>
-    <li>Backup Size: {backup-size}</li>
-</ul>
-<p>Thank you,</p>
-<p>Your Company</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Template</title>
+    <style>
+        /* Base Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* Content */
+        .content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 4px;
+        }
+        .content p {
+            margin: 0 0 20px;
+        }
+        /* Table */
+        .details-table {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+        .details-table th,
+        .details-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #dddddd;
+        }
+        .details-table th {
+            background-color: #f2f2f2;
+        }
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: #777777;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <p>Dear {name},</p>
+            <p>We are pleased to inform you that a backup of your files has been created.</p>
+            <table class="details-table">
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>{email}</td>
+                </tr>
+                <tr>
+                    <td>Backup Time</td>
+                    <td>{backup-time}</td>
+                </tr>
+                <tr>
+                    <td>Backup Location</td>
+                    <td>{backup-location}</td>
+                </tr>
+                <tr>
+                    <td>Backup Size</td>
+                    <td>{backup-size}</td>
+                </tr>
+            </table>
+            <p>Thank you,</p>
+            <p>Your Company</p>
+        </div>
+        <p class="footer">This email was sent by Your Company. &copy; 2023 All rights reserved.</p>
+    </div>
+</body>
+</html>

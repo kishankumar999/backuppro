@@ -1,6 +1,6 @@
 <?php
 // Load the configuration
-$config = include 'config.php';
+$config = include __DIR__ .DIRECTORY_SEPARATOR.'config.php';
 
 // Check if backup frequency and time are set in the config
 if (isset($config['backup_frequency']) && isset($config['backup_time'])) {
@@ -39,10 +39,10 @@ if (isset($config['backup_frequency']) && isset($config['backup_time'])) {
         $nextBackupTimestamp = strtotime('+' . $interval, $lastBackupTimestamp);
 
                              // echo dates in human readable format
-    echo date('Y-m-d H:i:s', $currentTime) . '<br>';
-    echo date('Y-m-d H:i:s', $backupTimestamp) . '<br>';
-    echo date('Y-m-d H:i:s', $lastBackupTimestamp) . '<br>';
-    echo date('Y-m-d H:i:s', $nextBackupTimestamp) . '<br>';
+    // echo date('Y-m-d H:i:s', $currentTime) . '<br>';
+    // echo date('Y-m-d H:i:s', $backupTimestamp) . '<br>';
+    // echo date('Y-m-d H:i:s', $lastBackupTimestamp) . '<br>';
+    // echo date('Y-m-d H:i:s', $nextBackupTimestamp) . '<br>';
         // Check if it's time for backup based on the next backup timestamp
         if ($currentTime >= $nextBackupTimestamp) {
 
@@ -50,11 +50,14 @@ if (isset($config['backup_frequency']) && isset($config['backup_time'])) {
     
 
             // Perform the backup operation here
-            include 'backup_drive.php';
+            // include from current direcotry backup_drive.php using dir magic constant
+            // set variable dont_check_login to true to bypass login check
+            $dont_check_login = true;
+            include __DIR__ .DIRECTORY_SEPARATOR. '/backup_drive.php';
 
             // After successful backup, update the last backup timestamp to the current time
             $config['last_backup_timestamp'] = $currentTime;
-            file_put_contents('config.php', '<?php return ' . var_export($config, true) . ';');
+            file_put_contents(__DIR__. DIRECTORY_SEPARATOR .'config.php', '<?php return ' . var_export($config, true) . ';');
         }
     }
 }

@@ -58,9 +58,15 @@
             $templateContent = file_get_contents($templateFile);
             preg_match('/<subject>(.*?)<\/subject>/s', $templateContent, $matches);
             $defaultSubject = isset($matches[1]) ? $matches[1] : 'Backup Notification';
-        }
 
+            // Remove the subject line from the template
+        }
+        
         $templateContent = file_get_contents($templateFile);
+        $templateContent = preg_replace('/<subject>(.*?)<\/subject>/s', '', $templateContent);
+
+        // remove empty lines
+        $templateContent = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $templateContent);
         ?>
 
         <form method="POST">
