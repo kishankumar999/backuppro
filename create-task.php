@@ -43,29 +43,29 @@ function convertMonthsToValidFormat(array $months)
         $month = strtolower($month);
         switch ($month) {
             case 'january':
-                return '1';
+                return 'jan';
             case 'february':
-                return '2';
+                return 'feb';
             case 'march':
-                return '3';
+                return 'mar';
             case 'april':
-                return '4';
+                return 'apr';
             case 'may':
-                return '5';
+                return 'may';
             case 'june':
-                return '6';
+                return 'jun';
             case 'july':
-                return '7';
+                return 'jul';
             case 'august':
-                return '8';
+                return 'aug';
             case 'september':
-                return '9';
+                return 'sep';
             case 'october':
-                return '10';
+                return 'oct';
             case 'november':
-                return '11';
+                return 'nov';
             case 'december':
-                return '12';
+                return 'dec';
             default:
                 return false;
         }
@@ -110,9 +110,9 @@ function convertDaysToValidFormat(array $days)
 $_POST['days']= json_decode($_POST['days']);
 $_POST['days'] =  convertDaysToValidFormat($_POST['days']);
 $_POST['months']= json_decode($_POST['months']);
-$_POST['months']= convertMonthsToValidFormat($_POST['months']);
+ $_POST['months']= convertMonthsToValidFormat($_POST['months']);
 
-print_r($_POST['months']);
+// print_r($_POST['months']);
 
 $phpPath = exec("where php");
 $phpPath = trim($phpPath);
@@ -170,9 +170,9 @@ if (empty($schtasksPath)) {
 
         case 'monthly':
             $months = isset($_POST['months']) ? implode(',', $_POST['months']) : '';
-            $days = isset($_POST['days']) ? implode(',', $_POST['days']) : '';
+            $day = isset($_POST['dayMonthly']) ? $_POST['dayMonthly']: '1';
             $startTime = $_POST['startTime'];
-            $command = "$schtasksPath /Create /TN \"$taskName\" /TR \"$phpPath $cronScriptPath\" /SC MONTHLY /M $months /D $days /ST $startTime";
+            $command = "$schtasksPath /Create /TN \"$taskName\" /TR \"$phpPath $cronScriptPath\" /SC MONTHLY /M \"$months\" /D $day /ST $startTime";
             break;
 
         case 'startup':

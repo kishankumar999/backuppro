@@ -86,6 +86,20 @@ if (strpos($output, 'ERROR: The system cannot find the file specified.') !== fal
                     <option value="logon">When I Log On</option>
                 </select>
             </div>
+
+
+
+            <div id="daysMonthlyContainer" class="mb-4 hidden2 option-container" >
+            <div class="flex flex-wrap">
+            <?php for ($i = 1; $i <= 31; $i++) : ?>
+                <label class="inline-flex items-center mr-6 mb-3">
+                <input type="radio" class="form-radio" name="dayMonthly" value="<?= $i ?>" style="margin-right: 0.5rem;">
+                <span><?= $i ?></span>
+                </label>
+            <?php endfor; ?>
+            </div>
+
+            </div>
             <div id="frequencyContainer" class="mb-4 hidden option-container" >
                 <label class="block text-sm font-bold mb-2" for="frequency">Frequency (in minutes):</label>
                 <input class="form-input" id="frequency" name="frequency" type="number" min="1" >
@@ -186,15 +200,12 @@ if (strpos($output, 'ERROR: The system cannot find the file specified.') !== fal
                     Create Task</button>
             </div>
         </form>
-        <div class="task-list">
-            <h2 class="text-lg font-bold mb-4">Existing Tasks</h2>
-            <ul id="taskList"></ul>
-        </div>
+     
     </div>
 
     <script>
         const taskForm = document.getElementById('taskForm');
-        const taskList = document.getElementById('taskList');
+    
         const alertBox = document.getElementById('alertBox');
 
         // Function to display an alert message
@@ -209,19 +220,7 @@ if (strpos($output, 'ERROR: The system cannot find the file specified.') !== fal
             }, 3000);
         }
 
-        // Function to add a task to the task list
-        function addTaskToList(taskName) {
-            const taskItem = document.createElement('li');
-            taskItem.classList.add('task-item');
-            taskItem.innerHTML = `
-                <span class="task-name">${taskName}</span>
-                <div class="task-actions">
-                    <button class="btn btn-edit">Edit</button>
-                    <button class="btn btn-delete">Delete</button>
-                </div>
-            `;
-            taskList.appendChild(taskItem);
-        }
+   
 
         
        function onTriggerElementChange()
@@ -253,7 +252,7 @@ if (strpos($output, 'ERROR: The system cannot find the file specified.') !== fal
 
                 case 'monthly':
                     document.getElementById('monthsContainer').classList.remove('hidden');
-                    document.getElementById('daysContainer').classList.remove('hidden');
+                    document.getElementById('daysMonthlyContainer').classList.remove('hidden');
                     document.getElementById('startTimeContainer').classList.remove('hidden');
                     break;
             }
@@ -274,6 +273,7 @@ if (strpos($output, 'ERROR: The system cannot find the file specified.') !== fal
             const startTime = document.getElementById('startTime').value;
             const days = Array.from(document.querySelectorAll('input[name="days[]"]:checked')).map(el => el.value);
             const months = Array.from(document.querySelectorAll('input[name="months[]"]:checked')).map(el => el.value);
+   
 
             // Adding Validation based on trigger type
             if (triggerType === 'hourly') {
@@ -297,9 +297,11 @@ if (strpos($output, 'ERROR: The system cannot find the file specified.') !== fal
             }
 
             // if trigger type monthly
+            var dayMonthly = "";
             if (triggerType === 'monthly') {
-                if (days.length === 0) {
-                    showAlert('Please select at least one day.', 'text-red-500');
+                 dayMonthly =document.querySelector('input[name="dayMonthly"]:checked').value;
+                if (dayMonthly === "") {
+                    showAlert('Please select a day.', 'text-red-500');
                     return;
                 }
 
@@ -319,8 +321,10 @@ if (strpos($output, 'ERROR: The system cannot find the file specified.') !== fal
                 if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                     const response = xhr.responseText;
                     showAlert(response, 'text-green-500');
-                    addTaskToList(taskName);
+                    // addTaskToList(taskName);
                     taskForm.reset();
+                    // refresh the page. 
+                    location.reload(); 
                 } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
                     showAlert('Failed to create scheduled task.', 'text-red-500');
                 }
@@ -339,7 +343,7 @@ if (strpos($output, 'ERROR: The system cannot find the file specified.') !== fal
 
             // Send the data to the PHP script
             
-            const data = `taskName=${encodeURIComponent(taskName)}&triggerType=${encodeURIComponent(triggerType)}&frequencyHours=${encodeURIComponent(frequencyHours)}&frequency=${encodeURIComponent(frequency)}&startTime=${encodeURIComponent(startTime)}&days=${encodeURIComponent(JSON.stringify(days))}&months=${encodeURIComponent(JSON.stringify(months))}`;
+            const data = `taskName=${encodeURIComponent(taskName)}&dayMonthly=${encodeURIComponent(dayMonthly)}&triggerType=${encodeURIComponent(triggerType)}&frequencyHours=${encodeURIComponent(frequencyHours)}&frequency=${encodeURIComponent(frequency)}&startTime=${encodeURIComponent(startTime)}&days=${encodeURIComponent(JSON.stringify(days))}&months=${encodeURIComponent(JSON.stringify(months))}`;
            console.log(data);
            console.log(taskName);
            alert(data);
@@ -350,11 +354,6 @@ if (strpos($output, 'ERROR: The system cannot find the file specified.') !== fal
 
         // set on page load and on page load run onTriggerElementChange
         window.onload = onTriggerElementChange();
-
-   
-
-        
-
     </script>
 </body>
 
