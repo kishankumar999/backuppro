@@ -1,4 +1,5 @@
 <?php
+ini_set('memory_limit', '-1');
 // Include the config file
 include 'validate_login.php'; 
 $config = include('config.php');
@@ -10,9 +11,9 @@ $dbPass = $config['db_password'];
 $dbName = $config['db_name'];
 
 // Path of mysqlDump
-$pathOfMysqlDump = 'C:\xampp\mysql\bin\mysqldump.exe';
+// $pathOfMysqlDump = 'C:\xampp\mysql\bin\mysqldump.exe';
 // $pathOfMysqlDump = 'mysqldump';
-
+$pathOfMysqlDump = $config['mysqldump_path'];
 // Backup file name and path
 $backupFile = 'backup.sql';
 $zipFile = 'backup.zip';
@@ -21,17 +22,25 @@ $zipFile = 'backup.zip';
 if ($dbPass === '') {
     $command = "$pathOfMysqlDump --single-transaction --host=$dbHost --user=$dbUser $dbName > $backupFile";
 } else {
-    $command = "mysqldump --single-transaction --host=$dbHost --user=$dbUser --password='$dbPass' $dbName > $backupFile";
+    $command = "$pathOfMysqlDump  --single-transaction --host=$dbHost --user=$dbUser --password='$dbPass' $dbName > $backupFile";
 }
 // echo 'Executing command: ' . $command . PHP_EOL;
 $output = [];
 $returnVar = 0;
 exec($command, $output, $returnVar);
 
+// Print the captured output and return status
+// echo "Command Output:\n";
+// echo implode("\n", $output);
+// echo "\nReturn Status: $returnVar\n;";
+
+
 // Check for errors
 if ($returnVar !== 0) {
+    echo $command."<br>"; 
     echo 'mysqldump command failed with error code: ' . $returnVar;
     var_dump($output);
+    var_dump($returnVar);
     echo 'Error output: ' . implode(PHP_EOL, $output);
     exit;
 }
@@ -75,5 +84,5 @@ readfile($zipFile);
 
 // Clean up temporary files
 unlink($backupFile);
-unlink($zipFile);
+unlink($zipFile);   
 ?>

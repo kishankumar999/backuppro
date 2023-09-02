@@ -1,29 +1,18 @@
 <?php
-if(!isset($dont_check_login) || $dont_check_login != true)
-{
-    include __DIR__ . DIRECTORY_SEPARATOR . 'validate_login.php'; 
+ini_set('memory_limit', '1000M');
+ini_set('max_execution_time', 60 * 10); //10 minutes
+if (!isset($dont_check_login) || $dont_check_login != true) {
+    include __DIR__ . DIRECTORY_SEPARATOR . 'validate_login.php';
 }
-// header('Content-Length: ' . ob_get_length());
-// Send the HTTP headers for chunked encoding
 
-// // Disable output buffering
-// ini_set('output_buffering', 'off');
-// ini_set('zlib.output_compression', 'off');
 
 // Enable implicit flush
 ob_implicit_flush(true);
 
-// Set an appropriate timeout value
-// set_time_limit(0);
-// header('Content-Type: text/html; charset=utf-8');
-// header('Transfer-Encoding: chunked');
-
-//apache_setenv('no-gzip', '1');
-
-
 // Enable error reporting
 // error_reporting(E_ALL);
 // ini_set('display_errors', 1);
+
 // Include the necessary Google API files
 // include your composer dependencies
 require_once __DIR__ . DIRECTORY_SEPARATOR . 'vendor/autoload.php';
@@ -35,12 +24,10 @@ $client = new Google_Client();
 $client->setApplicationName('BackupPro');
 $client->setScopes(Google_Service_Drive::DRIVE);
 $client->addScope(Google_Service_Gmail::GMAIL_SEND);
-$client->setAuthConfig(__DIR__ . DIRECTORY_SEPARATOR. $config['client_secret']);
+$client->setAuthConfig(__DIR__ . DIRECTORY_SEPARATOR . $config['client_secret']);
 $client->setAccessType('offline');
 $client->setPrompt('select_account consent');
 
-//echo $currentURL; 
-  //  exit; 
 $client->setRedirectUri($config['redirect_url']);
 
 
@@ -50,7 +37,6 @@ if (isset($_GET['code'])) {
     file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . 'token.json', json_encode($client->getAccessToken()));
 }
 
-
 // Authorize the client
 if (!$client->isAccessTokenExpired()) {
     // Save the access token for future use
@@ -58,7 +44,7 @@ if (!$client->isAccessTokenExpired()) {
 }
 
 // Check if token already exists
-if (file_exists(__DIR__ . DIRECTORY_SEPARATOR .'token.json')) {
+if (file_exists(__DIR__ . DIRECTORY_SEPARATOR . 'token.json')) {
     $accessToken = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'token.json'), true);
     $client->setAccessToken($accessToken);
 } else {
@@ -78,22 +64,24 @@ $dbName = $config['db_name'];
 // Path of mysqldumps
 $pathOfMysqlDump = $config['mysqldump_path'];
 // Backup file name and path
-$backupFile = __DIR__ . DIRECTORY_SEPARATOR .'backup.sql';
-$zipFile = __DIR__ . DIRECTORY_SEPARATOR .'backup.zip';
+$backupFile = __DIR__ . DIRECTORY_SEPARATOR . 'backup.sql';
+$zipFile = __DIR__ . DIRECTORY_SEPARATOR . 'backup.zip';
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Backup Progress</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-gray-100 flex flex-col items-center justify-center h-screen">
     <div class="flex gap-2 my-5">
         <img width="32" alt="Google Drive icon (2020)" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Google_Drive_icon_%282020%29.svg/512px-Google_Drive_icon_%282020%29.svg.png">
-        <div class="text-bold">Google Drive  backup</div>
+        <div class="text-bold">Google Drive backup</div>
     </div>
     <div class="bg-white shadow-lg rounded-lg p-6 w-96">
         <h1 class="text-2xl font-bold mb-6">Backup Progress</h1>
@@ -103,12 +91,12 @@ $zipFile = __DIR__ . DIRECTORY_SEPARATOR .'backup.zip';
             </div>
         </div>
         <p id="statusText" class="text-gray-500 mb-4">Backing up database...</p>
-        
+
         <p id="downloadLink" class="text-gray-500 hidden flex flex-col gap-2">
-    <a id="copyLinkButton" href="#" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Copy Backup Link</a>
-    <a id="openLinkButton" href="#" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Open Backup Link</a>
-    <a id="goBackButton" href="dashboard.php" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Go to Dashboard</a>
-</p>
+            <a id="copyLinkButton" href="#" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Copy Backup Link</a>
+            <a id="openLinkButton" href="#" target="_blank" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Open Backup Link</a>
+            <a id="goBackButton" href="dashboard.php" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Go to Dashboard</a>
+        </p>
     </div>
     <script>
         let countdownTimeout;
@@ -147,6 +135,7 @@ $zipFile = __DIR__ . DIRECTORY_SEPARATOR .'backup.zip';
         }
     </script>
 </body>
+
 </html>
 
 <?php
@@ -200,7 +189,8 @@ flush(); // Send the HTML content to the browser immediately
 $service = new Google_Service_Drive($client);
 
 
-function generateBackupFileName($template) {
+function generateBackupFileName($template)
+{
     $currentDate = date('Y-m-d');
     // current time in 12 hour format with AM/PM separated by - 
     $currentTime = date('h-i-sA');
@@ -229,73 +219,40 @@ $backupFileName = generateBackupFileName($template);
 // find folder id from name in root if exists in drive else create new folder
 
 // if isset folder name and not blank
-if(isset($config['folder_name']) && !empty($config['folder_name']))
-{
-$folderName = $config['folder_name'];
-$folderId = null;
-$optParams = array(
-    'q' => "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false",
-    'fields' => 'files(id, name)'
-);
-$results = $service->files->listFiles($optParams);
+if (isset($config['folder_name']) && !empty($config['folder_name'])) {
+    $folderName = $config['folder_name'];
+    $folderId = null;
+    $optParams = array(
+        'q' => "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false",
+        'fields' => 'files(id, name)'
+    );
+    $results = $service->files->listFiles($optParams);
 
-if (count($results->getFiles()) == 0) {
-    // create folder directly under the root directory (no parent folder)
-    $fileMetadata = new Google_Service_Drive_DriveFile(array(
-        'name' => $folderName,
-        'mimeType' => 'application/vnd.google-apps.folder'
-    ));
-    $file = $service->files->create($fileMetadata, array(
-        'fields' => 'id'
-    ));
-    $folderId = $file->id;
-} else {
-    $folderId = $results->getFiles()[0]->getId();
-}
-
+    if (count($results->getFiles()) == 0) {
+        // create folder directly under the root directory (no parent folder)
+        $fileMetadata = new Google_Service_Drive_DriveFile(array(
+            'name' => $folderName,
+            'mimeType' => 'application/vnd.google-apps.folder'
+        ));
+        $file = $service->files->create($fileMetadata, array(
+            'fields' => 'id'
+        ));
+        $folderId = $file->id;
+    } else {
+        $folderId = $results->getFiles()[0]->getId();
+    }
 }
 
 $fileMetadata = new Google_Service_Drive_DriveFile(array(
     'name' => $backupFileName
 ));
-if(isset($folderId) && !empty($folderId))
-{
+if (isset($folderId) && !empty($folderId)) {
     $fileMetadata->setParents(array($folderId));
 }
 
 
 
 
-// $fileMetadata->setParents(array('folderId'));
-
-// Specify the MIME type of the file
-$fileMimeType = 'application/zip';
-
-// Set the file content
-$fileContent = file_get_contents( $zipFile);
-
-// Create the file
-$file = $service->files->create($fileMetadata, array(
-    'data' => $fileContent,
-    'mimeType' => $fileMimeType,
-    'uploadType' => 'multipart',
-    'fields' => 'id'
-));
-
-// Get the file ID
-$fileId = $file->id;
-
-// Generate the download URL
-$downloadUrl = 'https://drive.google.com/uc?export=download&id=' . $fileId;
-
-
-// update status sending notification email
-echo '<script>
-        updateProgressBar(100);
-        updateStatusText("Sending notication email...  ");
-    </script>';
-ob_flush(); // Flush the output buffer
-flush(); // Send the HTML content to the browser immediately
 
 
 
@@ -303,41 +260,36 @@ flush(); // Send the HTML content to the browser immediately
 
 
 // Set the parent folder ID if necessary
+// if isset folder name and not blank then Pick it from the Config. 
+if (isset($config['folder_name']) && !empty($config['folder_name'])) {
+    $folderName = $config['folder_name'];
+    $folderId = null;
+    $optParams = array(
+        'q' => "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false",
+        'fields' => 'files(id, name)'
+    );
+    $results = $service->files->listFiles($optParams);
 
-// find folder id from name in root if exists in drive else create new folder
-
-// if isset folder name and not blank
-if(isset($config['folder_name']) && !empty($config['folder_name']))
-{
-$folderName = $config['folder_name'];
-$folderId = null;
-$optParams = array(
-    'q' => "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false",
-    'fields' => 'files(id, name)'
-);
-$results = $service->files->listFiles($optParams);
-
-if (count($results->getFiles()) == 0) {
-    // create folder directly under the root directory (no parent folder)
-    $fileMetadata = new Google_Service_Drive_DriveFile(array(
-        'name' => $folderName,
-        'mimeType' => 'application/vnd.google-apps.folder'
-    ));
-    $file = $service->files->create($fileMetadata, array(
-        'fields' => 'id'
-    ));
-    $folderId = $file->id;
-} else {
-    $folderId = $results->getFiles()[0]->getId();
-}
-
+    // find folder id from name in root if exists in drive else create new folder
+    if (count($results->getFiles()) == 0) {
+        // create folder directly under the root directory (no parent folder)
+        $fileMetadata = new Google_Service_Drive_DriveFile(array(
+            'name' => $folderName,
+            'mimeType' => 'application/vnd.google-apps.folder'
+        ));
+        $file = $service->files->create($fileMetadata, array(
+            'fields' => 'id'
+        ));
+        $folderId = $file->id;
+    } else {
+        $folderId = $results->getFiles()[0]->getId();
+    }
 }
 
 $fileMetadata = new Google_Service_Drive_DriveFile(array(
     'name' => $backupFileName
 ));
-if(isset($folderId) && !empty($folderId))
-{
+if (isset($folderId) && !empty($folderId)) {
     $fileMetadata->setParents(array($folderId));
 }
 
@@ -350,18 +302,80 @@ if(isset($folderId) && !empty($folderId))
 $fileMimeType = 'application/zip';
 
 // Set the file content
-$fileContent = file_get_contents( $zipFile);
+//$fileContent = file_get_contents( $zipFile);
 
-// Create the file
-$file = $service->files->create($fileMetadata, array(
-    'data' => $fileContent,
-    'mimeType' => $fileMimeType,
-    'uploadType' => 'multipart',
-    'fields' => 'id'
-));
+echo "Shishir";
+
+
+// NEW cODE. 
+// ==========================
+
+function readVideoChunk($handle, $chunkSize)
+{
+    $byteCount = 0;
+    $giantChunk = "";
+    while (!feof($handle)) {
+        // fread will never return more than 8192 bytes if the stream is read
+        // buffered and it does not represent a plain file
+        $chunk = fread($handle, 8192);
+        $byteCount += strlen($chunk);
+        $giantChunk .= $chunk;
+        if ($byteCount >= $chunkSize) {
+            return $giantChunk;
+        }
+    }
+    return $giantChunk;
+}
+
+$chunkSizeBytes = 1 * 1024 * 1024; // Set your desired chunk size
+
+// Your Google Drive service setup here (e.g., $service = new Google_Service_Drive($client))
+
+// Specify the MIME type of the file
+$fileMimeType = 'application/zip';
+
+// Create the file metadata
+// $fileMetadata = new Google_Service_Drive_DriveFile();
+// $fileMetadata->name = "Large File.zip";
+
+// Call the API with the media upload, defer so it doesn't immediately return.
+$client->setDefer(true);
+$request = $service->files->create($fileMetadata);
+
+// Create a media file upload to represent our upload process.
+$media = new Google_Http_MediaFileUpload(
+    $client,
+    $request,
+    $fileMimeType,
+    null,
+    true,
+    $chunkSizeBytes
+);
+$media->setFileSize(filesize($zipFile));
+
+// Upload the various chunks. $status will be false until the process is complete.
+$status = false;
+$handle = fopen($zipFile, "rb");
+while (!$status && !feof($handle)) {
+    $chunk = readVideoChunk($handle, $chunkSizeBytes);
+    $status = $media->nextChunk($chunk);
+}
+
+// The final value of $status will be the data from the API for the object that has been uploaded.
+$result = false;
+if ($status != false) {
+    $result = $status;
+}
+
+fclose($handle);
 
 // Get the file ID
-$fileId = $file->id;
+$fileId = $result->id;
+
+
+// ===============================================
+// NEW CODE ENDS. 
+// ===============================================
 
 // Generate the download URL
 $downloadUrl = 'https://drive.google.com/uc?export=download&id=' . $fileId;
@@ -370,17 +384,12 @@ $downloadUrl = 'https://drive.google.com/uc?export=download&id=' . $fileId;
 // update status sending notification email
 echo '<script>
         updateProgressBar(100);
-        updateStatusText("Sending notication email...  ");
+        updateStatusText("Uploaded on Google Drive now Sending notication email...  ");
     </script>';
 ob_flush(); // Flush the output buffer
 flush(); // Send the HTML content to the browser immediately
 
-
-
-
-
-
-
+$client->setDefer(false);
 $service = new Google_Service_Gmail($client);
 
 // Read subscribers from subscriber.json file
@@ -451,20 +460,9 @@ if (!empty($subscribers)) {
     echo "No subscribers found.";
 }
 
-
-
-
-
-
-
-
-
-
 // remvoing files 
 unlink($backupFile);
 unlink($zipFile);
-
-
 
 
 echo '<script>

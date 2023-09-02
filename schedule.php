@@ -58,6 +58,29 @@ if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 } 
 ?>
 
+<?php
+// if Linux platform
+// if (strtoupper(PHP_OS) === 'LINUX') {
+    ?>
+
+    <!-- flowbite button -->
+    <div class="flex flex-col justify-center max-w-xl mx-auto items-center gap-5 bg-white p-8 mb-10">
+        <!-- Linux Logo -->
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/1200px-Tux.svg.png" alt="Linux Logo" width="50" height="50">
+        <!-- muted text tailwind -->
+        <div class="flex flex-col justify-center gap-3">
+            <p class="text-gray-400 text-sm">We detected you are running BackupPro on a Linux Server.</p>
+            <a href="linux_cron.php" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                Set up Automated Backup on Linux.
+            </a>
+        </div>
+    </div>
+
+    <?php
+// }
+?>
+
+
     <!-- Content -->
     <div class="max-w-xl mx-auto   bg-white p-8">
         <h2 class="text-2xl font-bold mb-4">Backup Frequency Setup</h2>
