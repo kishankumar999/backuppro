@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['credentials'])) {
                     // path till the  folder 
                     $path = $_SERVER['REQUEST_URI'];
                     // remove the current page name
-                    $path = str_replace("setup_drive.php", "", $path);
+                    $path = str_replace("google_drive_setup.php", "", $path);
                     $copyurl =   $protocol.'://' . $_SERVER['HTTP_HOST'] .$path.'backup_drive.php'; 
                     ?>
 
