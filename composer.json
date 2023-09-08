@@ -8,7 +8,8 @@
     "extra": {
         "google/apiclient-services": [
             "Drive",
-            "Gmail"
+            "Gmail",
+            "PeopleService"
 
         ]
     }

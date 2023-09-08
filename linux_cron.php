@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+<head><?php include("favicon.php"); ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
@@ -210,7 +210,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <form method="POST" class="mt-4">
                 <label class="block mb-2" for="new_command">New Command</label>
                 <input id="new_command" name="new_command" class="w-full  mb-2 px-2 py-1 border rounded" value="<?php echo $commandToCheck; ?>">
-                <button type="submit" class="bg-blue-500 block w-full hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Set Command Nows</button>
+                <button type="submit" class="bg-blue-500 block w-full hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Set Command Now</button>
             </form>
         </div>
     </div>
