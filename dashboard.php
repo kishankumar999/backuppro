@@ -84,7 +84,7 @@ $config = include('config.php');
                     <h2 class="text-xl font-bold">Backup to Google Drive</h2>
                 </a>
             <?php else : ?>
-                <a href="setup_drive.php" class="block flex gap-2 justify-center bg-green-500 hover:bg-blue-600 text-white text-center py-8 rounded">
+                <a href="google_drive_setup.php" class="block flex gap-2 justify-center bg-green-500 hover:bg-blue-600 text-white text-center py-8 rounded">
                     <img width="32" alt="Google Drive icon (2020)" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Google_Drive_icon_%282020%29.svg/512px-Google_Drive_icon_%282020%29.svg.png">
 
                     <h2 class="text-xl font-bold">Setup Google Drive for Backup</h2>

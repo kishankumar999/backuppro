@@ -1,4 +1,5 @@
 <?php
+include("cron_parser.php");
 
 function hasShellAccess()
 {
@@ -18,7 +19,7 @@ function hasCronTabForCommand($commandToCheck)
 
         // Check if the line contains the command to check
         if (strpos($line, $commandToCheck) !== false) {
-            return true;
+            return $line;
         }
     }
 
@@ -29,31 +30,29 @@ function updateCronTab($newCommand)
 {
     // Validate if the command is a valid cron job command and contains "php"
     if (strpos($newCommand, 'php') !== false && preg_match('/^\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+.+$/', $newCommand)) {
-        
+
         // Read the existing cron tab
         exec('crontab -l', $currentCronTab);
 
         // print_r($cursrentCronTab);
 
         $pathOfNewCommand = explode("php", $newCommand, 2)[1]; // Get the path of the new command
-        
+
         // Filter out existing commands with the same path as the new command
-        $filteredCronTab = array_filter($currentCronTab, function($line) use ($pathOfNewCommand) {
+        $filteredCronTab = array_filter($currentCronTab, function ($line) use ($pathOfNewCommand) {
             return strpos($line, $pathOfNewCommand) === false;
         });
 
         // Add the new command to the filtered cron tab
         $filteredCronTab[] = $newCommand;
-         
+
         // Update the cron tab
         $newCronTab = implode(PHP_EOL, $filteredCronTab);
-        file_put_contents('new_cron_tab', $newCronTab."\n");
+        file_put_contents('new_cron_tab', $newCronTab . "\n");
         exec('crontab new_cron_tab');
         //unlink('new_cron_tab');
         return "Cron tab updated successfully.";
-    }
-    else
-    {
+    } else {
         return "Invalid Cron Job Command";
     }
 }
@@ -64,8 +63,7 @@ function updateCronTab($newCommand)
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $newCommand = $_POST["new_command"];
-    if(hasShellAccess())
-    {
+    if (hasShellAccess()) {
         echo $updateResult = updateCronTab($newCommand);
     }
 }
@@ -77,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
-    <title>Cron Job Generator</title>
+    <title>Backup Scheduler: Linux (Cron Job)</title>
 </head>
 
 <body>
@@ -97,21 +95,77 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 It will also expain what the command is doing and when it will be executed. And also next 5 times when it will be executed.
             </p>
 
-            <h2>Are there any Previous Schedule Set?</h2>
-
-
-
-
+           
             <?php if (hasShellAccess()) { ?>
-                <p class="bg-yellow-100 py-1 px-2">
+                <p class="">
                     <?php
-
-
-
                     $commandToCheck = "php " . __DIR__ . DIRECTORY_SEPARATOR . "cron.php";
+                    $command_there = hasCronTabForCommand($commandToCheck);
+                    if ($command_there) {
+                        //secho "Cron tab is set for the command: $commandToCheck";
 
-                    if (hasCronTabForCommand($commandToCheck)) {
-                        echo "Cron tab is set for the command: $commandToCheck";
+                        // Breaking the set command into Schedule. 
+
+                        // Split the crontab entry into its components
+                        $parts = preg_split('/\s+/', $command_there);
+
+                        // Extract schedule and command
+                        $minute = $parts[0];
+                        $hour = $parts[1];
+                        $dayOfMonth = $parts[2];
+                        $month = $parts[3];
+                        $dayOfWeek = $parts[4];
+                        $command = implode(' ', array_slice($parts, 5));
+
+                        // Output parsed components
+                        // echo "Minute: $minute\n";
+                        // echo "Hour: $hour\n";
+                        // echo "Day of Month: $dayOfMonth\n";
+                        // echo "Month: $month\n";
+                        // echo "Day of Week: $dayOfWeek\n";
+                        // echo "Command: $command\n";
+
+                        $cronScheduler = new CronScheduler();
+$nextTimes = $cronScheduler->generateNextTimes($minute, $hour, $dayOfMonth, $month, $dayOfWeek, 5);
+
+?>
+<div class="bg-white px-6 pb-8 pt-5 shadow-xl">
+  <p class="mb-3 text-3xl">Current Backup Schedule</p>
+    
+
+  <p class="mb-3 mt-6 text-lg">5 Next backup dates.</p>
+  <ul class="flex flex-col gap-3">
+   
+ 
+  
+<?php
+foreach($nextTimes as $nextTime) {
+    ?>
+     <li>
+      <div class="flex items-center gap-2">
+        <svg class="w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="nz sb axp"><path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd"></path></svg>
+        <div class="text-lg">
+            <?php echo date("l F j, Y, h:i A", $nextTime->getTimestamp()) . "\n"; ?>
+        </div>
+      </div>
+      <div class="font-bold2 ml-6 text-sm text-gray-600">
+        <?php echo getRelativeTime($nextTime->format('Y-m-d H:i:s')) . "\n"; ?>    
+    </div>
+    </li>
+    <?php
+    
+    
+}?>
+</ul>
+</div>
+
+<div class="bg-gray-200 text-gray-500 p-4 text-base text-sm">
+
+    <?php echo  $command_there ; ?>
+ 
+
+</div>
+<?php
                     } else {
                         echo "No cron tab found for the command: <br><code> $commandToCheck </code>";
                     }
@@ -147,7 +201,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <option value="*">*</option>
                     <?php
                     for ($i = 0; $i <= 59; $i++) {
-                        echo "<option value=\"$i\">$i</option>";
+                        if(isset($minute) && $minute == $i) {
+                            $selected = "selected=\"selected\"";
+                        } else {
+                            $selected = "";
+                        }
+
+                
+                        echo "<option   $selected  value=\"$i\">$i</option>";
                     }
                     ?>
                 </select>
@@ -157,7 +218,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <option value="*">*</option>
                     <?php
                     for ($i = 0; $i <= 23; $i++) {
-                        echo "<option value=\"$i\">$i</option>";
+                        if(isset($hour) && $hour == $i) {
+                            $selected = "selected=\"selected\"";
+                        } else {
+                            $selected = "";
+                        }
+                        echo "<option  $selected value=\"$i\">$i</option>";
                     }
                     ?>
                 </select>
@@ -167,7 +233,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <option value="*">*</option>
                     <?php
                     for ($i = 1; $i <= 31; $i++) {
-                        echo "<option value=\"$i\">$i</option>";
+                        if(isset($dayOfMonth) && $dayOfMonth == $i) {
+                            $selected = "selected=\"selected\"";
+                        } else {
+                            $selected = "";
+                        }
+                        echo "<option $selected value=\"$i\">$i</option>";
                     }
                     ?>
                 </select>
@@ -176,8 +247,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <select id="month" class="w-full  mb-2 px-2 py-1 border rounded">
                     <option value="*">*</option>
                     <?php
+                    if (isset($month) && $month == $i) {
+                        $selected = "selected=\"selected\"";
+                    } else {
+                        $selected = "";
+                    }
                     for ($i = 1; $i <= 12; $i++) {
-                        echo "<option value=\"$i\">$i</option>";
+                        echo "<option $selected value=\"$i\">$i</option>";
                     }
                     ?>
                 </select>
@@ -186,8 +262,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <select id="dayOfWeek" class="w-full  mb-2 px-2 py-1 border rounded">
                     <option value="*">*</option>
                     <?php
+                    if(isset($dayOfWeek) && $dayOfWeek == $i) {
+                        $selected = "selected=\"selected\"";
+                    } else {
+                        $selected = "";
+                    }
                     for ($i = 0; $i <= 7; $i++) {
-                        echo "<option value=\"$i\">$i</option>";
+                        echo "<option  $selected  value=\"$i\">$i</option>";
                     }
                     ?>
                 </select>
@@ -239,7 +320,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     const hour = hourInput.value;
                     const dayOfMonth = dayOfMonthInput.value;
                     const month = monthInput.value;
-                    const dayOfWeek = dayOfWeekInput.value;
+                    const dayOfWeek = dayOfWeekInput.value==7?"0":dayOfWeekInput.value;
+                    console.log(dayOfWeek);
+                    
 
                     const command = `${minute} ${hour} ${dayOfMonth} ${month} ${dayOfWeek}`;
                     generatedCommand.textContent = command + commandToRun;
@@ -307,7 +390,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         timeZoneName: 'short'
                     };
 
-                    listItem.textContent  = time.toLocaleString('en-US', options);
+                    listItem.textContent = time.toLocaleString('en-US', options);
                     nextTimesList.appendChild(listItem);
                 });
             }

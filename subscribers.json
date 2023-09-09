@@ -6,5 +6,9 @@
     {
         "name": "sam collins",
         "email": "samcollins@mailinator.com"
+    },
+    {
+        "name": "test",
+        "email": "test@mailinator.com"
     }
 ]

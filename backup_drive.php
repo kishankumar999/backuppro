@@ -84,7 +84,7 @@ $zipFile = __DIR__ . DIRECTORY_SEPARATOR . 'backup.zip';
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 flex flex-col items-center justify-center h-screen">
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen py-10">
     <div class="flex gap-2 my-5">
         <img width="32" alt="Google Drive icon (2020)" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Google_Drive_icon_%282020%29.svg/512px-Google_Drive_icon_%282020%29.svg.png">
         <div class="text-bold">Google Drive backup</div>
