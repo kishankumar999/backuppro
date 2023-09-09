@@ -75,7 +75,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'setup_name' => $setupName,
             'backup_folder' => 'backups',
             'backup_file_name' => '{database_name}-{date}-{time}',
-            'redirect_url' => $currentURL
+            'redirect_url' => $currentURL, 
+            'timezone' => $_POST['timezone']
         );
 
         // Step 3.5: Find mysqldump path
@@ -204,6 +205,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="dashboard_password" class="block mb-2"> Password:</label>
                         <input  autocomplete="new-password" type="password" id="dashboard_password" name="dashboard_password" required class="border border-gray-300 p-2 w-full">
                     </div>
+                    <hr>
+                    <div class="my-5    ">
+                        <label for="setup_name" class="block mb-2">Timezone</label>
+                        <select name="timezone" id="timezoneDropdown" class="border border-gray-300 p-2 w-full">
+                            <?php
+                            function generateTimezoneOptions() {
+                                $timezones = timezone_identifiers_list();
+                                $output = '';
+                                foreach ($timezones as $timezone) {
+                                    $output .= "<option value=\"$timezone\">$timezone</option>";
+                                }
+                                return $output;
+                            }
+                            
+                            echo generateTimezoneOptions();
+                            ?>
+                        </select>
+                        <input autocomplete="off" type="hidden" id="setup_name" name="setup_name"  class="border border-gray-300 p-2 w-full">
+                    </div>
                     <div class="mb-5 hidden   ">
                         <label for="setup_name" class="block mb-2">Setup Name:</label>
                         <input autocomplete="off" type="hidden" id="setup_name" name="setup_name"  class="border border-gray-300 p-2 w-full">
@@ -216,6 +236,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </form>
     </div>
+    <script>
+// Function to automatically select the user's timezone
+function autoSelectUserTimezone() {
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const timezoneMapping = {
+        'Asia/Calcutta': 'Asia/Kolkata', // Map 'Asia/Calcutta' to 'Asia/Kolkata'
+        // Add more mappings as needed
+    };
+
+    const mappedTimezone = timezoneMapping[userTimezone] || userTimezone;
+
+    const dropdown = document.getElementById('timezoneDropdown');
+    for (let i = 0; i < dropdown.options.length; i++) {
+        if (dropdown.options[i].value === mappedTimezone) {
+            dropdown.selectedIndex = i;
+            break;
+        }
+    }
+}
+
+// Call the function to auto-select the user's timezone on page load
+window.onload = autoSelectUserTimezone;
+</script>
 </body>
 
 </html>

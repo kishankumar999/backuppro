@@ -180,7 +180,8 @@ flush(); // Send the HTML content to the browser immediately
 // Create zip archive
 $zip = new ZipArchive();
 $zip->open($zipFile, ZipArchive::CREATE);
-$zip->addFile($backupFile);
+// $zip->addFile($backupFile);
+$zip->addFile($backupFile, basename($backupFile)); 
 $zip->close();
 
 echo '<script>
@@ -212,6 +213,24 @@ function generateBackupFileName($template)
     return $backupFileName . '.zip'; // Add .zip extension to the file name
 }
 
+
+function generateFolderName($foldername)
+{
+    $currentDate = date('Y-m-d');
+    // current time in 12 hour format with AM/PM separated by - 
+    $currentTime = date('h-i-sA');
+    // getting datbase name from config.php
+    $config = include(__DIR__ . DIRECTORY_SEPARATOR . 'config.php');
+    $databaseName = $config['db_name'];
+
+    // Replace placeholders in the template with actual values
+    $backupFolderName = str_replace('{date}', $currentDate, $foldername);
+    $backupFolderName = str_replace('{time}', $currentTime, $backupFolderName);
+    $backupFolderName = str_replace('{database_name}', $databaseName, $backupFolderName);
+
+    return $backupFolderName ; // Add .zip extension to the file name
+}
+
 // Example usage:
 // get template from config
 $template = $config['backup_file_name'];
@@ -223,10 +242,10 @@ $backupFileName = generateBackupFileName($template);
 // Set the parent folder ID if necessary
 
 // find folder id from name in root if exists in drive else create new folder
-
+/*
 // if isset folder name and not blank
 if (isset($config['folder_name']) && !empty($config['folder_name'])) {
-    $folderName = $config['folder_name'];
+    $folderName = generateFolderName($config['folder_name']);
     $folderId = null;
     $optParams = array(
         'q' => "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false",
@@ -257,7 +276,7 @@ if (isset($folderId) && !empty($folderId)) {
 }
 
 
-
+*/
 
 
 
@@ -268,7 +287,7 @@ if (isset($folderId) && !empty($folderId)) {
 // Set the parent folder ID if necessary
 // if isset folder name and not blank then Pick it from the Config. 
 if (isset($config['folder_name']) && !empty($config['folder_name'])) {
-    $folderName = $config['folder_name'];
+    $folderName = generateFolderName($config['folder_name']);
     $folderId = null;
     $optParams = array(
         'q' => "mimeType='application/vnd.google-apps.folder' and name='$folderName' and trashed=false",
@@ -530,6 +549,13 @@ if ((isset($config['automated_backup_notification']) && $config['automated_backu
             $emailTemplate = str_replace('{backup-location}', $backupLocation, $emailTemplate);
             $emailTemplate = str_replace('{backup-size}', $backupSize, $emailTemplate);
 
+            // replace placeholders from subject 
+            $subject = str_replace('{name}', $name, $subject);
+            $subject = str_replace('{email}', $email, $subject);
+            $subject = str_replace('{backup-time}', date('Y-m-d h:i:s A'), $subject);
+            $subject = str_replace('{backup-location}', $backupLocation, $subject);
+            $subject = str_replace('{backup-size}', $backupSize, $subject);
+
             // Replace body in email template
             $body = $emailTemplate;
 
@@ -550,7 +576,7 @@ if ((isset($config['automated_backup_notification']) && $config['automated_backu
                 ?>
                    <div class=" flex items-center gap-4 border p-4 rounded-xl shadow mt-3">
                   <div class="">
-                    <svg class="w-12" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" enable-background="new 0 0 64 64">
+                    <svg class="w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" enable-background="new 0 0 64 64">
                     <path d="M32,2C15.431,2,2,15.432,2,32c0,16.568,13.432,30,30,30c16.568,0,30-13.432,30-30C62,15.432,48.568,2,32,2z M25.025,50
                 l-0.02-0.02L24.988,50L11,35.6l7.029-7.164l6.977,7.184l21-21.619L53,21.199L25.025,50z" fill="#43a047"></path>
                     </svg>
@@ -578,9 +604,18 @@ if ((isset($config['automated_backup_notification']) && $config['automated_backu
     }
 }
 
+
+
+
 // remvoing files 
 unlink($backupFile);
 unlink($zipFile);
+
+$currentTime = time();
+// After successful backup, update the last backup timestamp to the current time
+$config['last_backup_timestamp'] = $currentTime;
+file_put_contents(__DIR__ . DIRECTORY_SEPARATOR . 'config.php', '<?php return ' . var_export($config, true) . ';');
+ 
 
 
 echo '<script>

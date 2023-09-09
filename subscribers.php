@@ -96,6 +96,11 @@
         </form>
 
         <!-- Subscriber List -->
+        <?php
+        if (count($subscribers) != 0) {
+            
+        
+        ?>
         <table class="w-full">
             <thead>
                 <tr>
@@ -120,6 +125,7 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <?php } ?>
 
         <!-- Update Modal -->
         <div id="updateModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
