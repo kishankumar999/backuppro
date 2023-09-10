@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BackupPro Login</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
 </head>
 
 <body class="flex items-center justify-center min-h-screen bg-gray-100">
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if(isset($_GET['installation_complete']) && $_GET['installation_complete'] === 'true') {
         // Installation is complete, show success message
         ?>
-        <div class="max-w-xl my-5 mx-auto rounded-md bg-green-500 p-4 text-white shadow-md">
+        <div class="w-80 my-5 mx-auto rounded-md bg-green-500 p-4 text-white shadow-md">
             <div class="flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php
     }
     ?>
-        <div class="max-w-xl p-6 bg-white rounded shadow-md">
+        <div class="w-80 p-6 bg-white rounded shadow-md">
             <h1 class="text-2xl font-semibold mb-6">BackupPro Login</h1>
 
             <?php if ($error === 'InvalidCredentials') : ?>
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="password" id="password" name="password" class="w-full px-4 py-2 border rounded" required>
                 </div>
                 <div class="flex justify-between items-center">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Login</button>
+                    <button type="submit" class="bg-blue-500 w-full my-6 hover:bg-blue-600 text-white px-4 py-2 rounded">Login</button>
                 </div>
                 <!-- Lost password link muted in tailwind css with margin y 5 -->
                 <div class="flex justify-between items-center mt-5">

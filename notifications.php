@@ -13,8 +13,9 @@
 </head>
 <body class="bg-gray-50">
     <?php include 'email_notification_tabs.php'; ?>
-    <div class="container mx-auto px-4 py-8 max-w-xl bg-white">
-        <h1 class="text-2xl font-bold mb-4">Email Template</h1>
+    <div class="container mx-auto max-w-xl bg-white px-10 pt-10 pb-8 shadow-xl my-10 rounded-lg ring-1 ring-gray-900/5 ">
+      
+        <h1 class="text-xl font-bold mb-8">Email Template</h1>
 
         <?php
         $templateFile = 'email.html';
@@ -77,7 +78,7 @@
             <textarea id="template" name="template" class="w-full h-64 border-gray-300 rounded-md p-2 mb-4" placeholder="Enter your email template..."><?php echo htmlspecialchars($templateContent); ?></textarea>
             <details class="mt-4">
             <summary class="font-bold cursor-pointer py-1 px-2 bg-green-100 mb-5">Placeholders you can use</summary>
-            <ul class="ml-4 mt-2 list-disc">
+            <ul class="ml-4 my-5 list-disc">
                 <li>{name}</li>
                 <li>{email}</li>
                 <li>{backup-time}</li>
@@ -85,7 +86,7 @@
                 <li>{backup-size}</li>
             </ul>
         </details>
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save</button>
+            <button type="submit" class="bg-indigo-500 w-full text-white px-4 py-2 rounded">Save</button>
         </form>
 
       

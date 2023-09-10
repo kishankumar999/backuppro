@@ -1,17 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head><?php include("favicon.php"); ?>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscriber Management</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
-</head>
-<body class="bg-gray-50">
-    <?php include 'email_notification_tabs.php'; ?>
-    <div class="container mx-auto max-w-xl bg-white p-4">
-        <!--  include email tabs -->
-        <h1 class="text-2xl font-bold mb-4">Subscriber Management</h1>
-        <?php
+<?php
         // Function to read subscribers from JSON file
         function readSubscribers() {
             $file = 'subscribers.json';
@@ -81,40 +68,48 @@
         // Display subscribers
         $subscribers = readSubscribers();
         ?>
-
-        <!-- Subscriber Form -->
-        <form method="POST" class="mb-4">
-            <div class="flex flex-col mb-2">
-                <label for="name" class="text-lg font-semibold">Name</label>
-                <input type="text" name="name" id="name" class="border border-gray-300 p-2">
-            </div>
-            <div class="flex flex-col mb-2">
-                <label for="email" class="text-lg font-semibold">Email</label>
-                <input type="email" name="email" id="email" class="border border-gray-300 p-2">
-            </div>
-            <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded">Add Subscriber</button>
-        </form>
-
-        <!-- Subscriber List -->
-        <?php
+<!DOCTYPE html>
+<html lang="en">
+<head><?php include("favicon.php"); ?>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscriber Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+</head>
+<body class="bg-gray-50">
+    <?php include 'email_notification_tabs.php'; ?>
+    <div class="container mx-auto max-w-xl bg-white px-10 pt-10 pb-8 shadow-xl my-10 rounded-lg ring-1 ring-gray-900/5 ">
+      
+        <!--  include email tabs -->
+        <h1 class="text-xl font-bold mb-8">Email Confirmation Subscribers</h1>
+  <!-- Subscriber List -->
+  <?php
         if (count($subscribers) != 0) {
             
         
         ?>
-        <table class="w-full">
+        
+        
+        <table class="w-full my-10 table-auto">
             <thead>
-                <tr>
-                    <th class="text-left font-semibold">Name</th>
-                    <th class="text-left font-semibold">Email</th>
-                    <th class="text-left font-semibold">Actions</th>
+                <tr class="border-b border-gray-500 ">
+                    <th class="text-left font-semibold p-3 ">Subscriber</th>
+        
+                    <th class="text-left font-semibold p-3">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($subscribers as $index => $subscriber): ?>
-                    <tr>
-                        <td><?php echo $subscriber['name']; ?></td>
-                        <td><?php echo $subscriber['email']; ?></td>
-                        <td>
+                    <tr class="border-b border-gray-200 ">
+                        <td class="p-3">
+                        <div class="flex flex-col gap-1">
+                            <div class="text-xl font-semibold"><?php echo ucfirst( $subscriber['name']); ?></div>
+                            <?php echo $subscriber['email']; ?>
+                        </div>    
+                        </td>
+
+                       
+                        <td class="p-3">
                             <form method="POST" class="inline-block">
                                 <input type="hidden" name="delete" value="<?php echo $index; ?>">
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white font-semibold px-2 py-1 rounded">Delete</button>
@@ -125,7 +120,23 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
+
         <?php } ?>
+        
+        <div class="text-lg font-bold">Add a new Subscriber</div>
+        <!-- Subscriber Form -->
+        <form method="POST" class="my-10">
+            <div class="grid gap-5 mb-2 grid-cols-4">
+                <label for="name" class="text-lg font-semibold">Name</label>
+                <input type="text" name="name" id="name" class="flex-1 col-span-3 border border-gray-300 p-2">
+           
+                <label for="email" class="text-lg font-semibold">Email</label>
+                <input type="email" name="email" id="email" class="col-span-3  flex-1 border border-gray-300 p-2">
+            </div>
+            <button type="submit" class="w-full mt-5 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded">Add Subscriber</button>
+        </form>
+
+      
 
         <!-- Update Modal -->
         <div id="updateModal" class="fixed z-10 inset-0 overflow-y-auto hidden">
@@ -142,8 +153,10 @@
                             <label for="newEmail" class="text-lg font-semibold">New Email</label>
                             <input type="email" id="newEmail" name="newEmail" class="border border-gray-300 p-2">
                         </div>
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded">Update</button>
-                        <button type="button" onclick="closeUpdateModal()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded">Cancel</button>
+                        <div class="flex gap-2 my-10">
+                            <button type="submit" class=" bg-indigo-500 hover:bg-indigo-600 text-white font-semibold px-4 py-2 rounded">Update</button>
+                            <button type="button" onclick="closeUpdateModal()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded">Cancel</button>
+                        </div>
                     </form>
                 </div>
             </div>

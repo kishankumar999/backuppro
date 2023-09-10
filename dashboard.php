@@ -30,7 +30,7 @@ $config = include('config.php');
             <li class="pt-5">SETTINGS</li>
             <li><a href="google_drive_setup.php" class="text-blue-500">Drive Settings</a></li>
             <li><a href="db_settings.php" class="text-blue-500">Database Settings</a></li>
-            <li><a href="notifications.php" class="text-blue-500">Notifications Settings</a></li>
+            <li><a href="subscribers.php" class="text-blue-500">Notifications Settings</a></li>
             <li class="pt-5">ACCOUNT</li>
             <li><a href="reset_password.php" class="text-blue-500">Reset Password</a></li>
             <li><a href="reset.php" class="text-blue-500">Reset BackupPro</a></li>

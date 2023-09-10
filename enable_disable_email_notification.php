@@ -34,8 +34,8 @@ if (file_exists('config.php')) {
 </head>
 <body class="bg-gray-50">
     <?php include 'email_notification_tabs.php'; ?>
-    <div class="container mx-auto max-w-xl bg-white p-4">
-        <h1 class="text-2xl font-bold mb-4">Enable / Disable Notification</h1>
+    <div class="container mx-auto max-w-md bg-white px-10 pt-10 pb-8 shadow-xl my-10 rounded-lg ring-1 ring-gray-900/5 ">
+        <h1 class="text-xl font-bold mb-10">Enable / Disable Email Confirmation</h1>
 
         <?php if (isset($successMessage)): ?>
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
@@ -48,18 +48,26 @@ if (file_exists('config.php')) {
             <div class="mb-6">
                 <label class="inline-flex items-center">
                     <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600" name="manual_backup_notification" <?php if (($config['manual_backup_notification'] ?? 'false') === 'true') echo 'checked'; ?>>
-                    <span class="ml-2">Send Notification on Manual Backup to drive</span>
+                    <div class="ml-3">
+
+                        <span >On Manual Backup </span>
+                        <p class="text-sm text-slate-500">Receive an email confirmation on 1-Click backup from dashboard. </p>
+                    </div>
                 </label>
             </div>
             
             <div class="mb-6">
                 <label class="inline-flex items-center">
                     <input type="checkbox" class="form-checkbox h-5 w-5 text-indigo-600" name="automated_backup_notification" <?php if (($config['automated_backup_notification'] ?? 'false') === 'true') echo 'checked'; ?>>
-                    <span class="ml-2">Send Notification on Automated backup drive</span>
+                    <div class="ml-3">
+
+<span >On Scheduled Backup </span>
+<p class="text-sm text-slate-500">Recieve Email Confirmation of the backup on Schedule you have configured. </p>
+</div>
                 </label>
             </div>
 
-            <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded">Save</button>
+            <button type="submit" class="bg-indigo-500 w-full mt-7 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded">Save</button>
         </form>
     </div>
 </body>

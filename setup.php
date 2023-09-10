@@ -1,4 +1,11 @@
 <?php
+//  Exit if config.php exits. 
+if (file_exists('config.php')) {
+    header('Location: login.php');
+    exit();
+}
+
+
 session_start();
 $error = false;
 $error_not_writable = false;

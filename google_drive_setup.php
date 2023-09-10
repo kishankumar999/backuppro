@@ -5,7 +5,7 @@
 <head><?php include("favicon.php"); ?>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
+  <title>Google Drive Setup</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
 
 
@@ -86,8 +86,8 @@
           </div>
         </div>
         <div class="flex-1 p-4">
-          <div class="mb-4 text-lg font-semibold">Create a Google Project</div>
-          <div class="font-semibold3 text-sm text-slate-800">
+          <div class="mb-5 text-xl font-semibold">Create a Google Project</div>
+          <div class="font-semibold3  text-slate-800">
             <p class="mb-5">Creating a Google Cloud Project is a foundational step for using the Google Drive API and other Google APIs. Let's begin.</p>
             <ul class="ml-4 flex list-disc flex-col gap-2">
               <li>
@@ -115,8 +115,8 @@
           </div>
         </div>
         <div class="flex-1 p-4">
-          <div class="mb-4 text-lg font-semibold">Enable APIs and Services</div>
-          <div class="font-semibold3 text-sm text-slate-800">
+          <div class="mb-5 text-xl font-semibold">Enable APIs and Services</div>
+          <div class="font-semibold3  text-slate-800">
             <p class="mb-4">We <strong>need 3 Google API's for BackupPro,</strong></p>
             <ol class="mb-4 ml-4 flex list-decimal flex-col gap-2">
               <li><strong>Google Drive</strong> <br />to store backup,</li>
@@ -152,8 +152,8 @@
           </div>
         </div>
         <div class="flex-1 p-4">
-          <div class="mb-2 text-lg font-semibold">Setup Google consent screen</div>
-          <div class="font-semibold3 text-sm text-slate-800">
+          <div class="mb-5 text-xl font-semibold">Setup Google consent screen</div>
+          <div class="font-semibold3  text-slate-800">
             <p class="mb-4">When you use OAuth 2.0 for authorisation, your app requests authorisations for one or more scopes of access from a Google Account.</p>
             <p class="mb-4">Google displays a consent screen to the user that includes a summary of your project and its policies and the requested scopes of access.</p>
 
@@ -183,8 +183,8 @@
           </div>
         </div>
         <div class="flex-1 p-4">
-          <div class="mb-2 text-lg font-semibold">Create & Download credentials to access your enabled APIs.</div>
-          <div class="font-semibold3 text-sm text-slate-800">
+          <div class="mb-5 text-xl font-semibold">Create & Download credentials to access your enabled APIs.</div>
+          <div class="font-semibold3  text-slate-800">
             <p class="my-5 text-lg">Let's do it.</p>
 
             <ol class="ml-4 flex list-decimal flex-col gap-4">
@@ -247,7 +247,7 @@
           </div>
         </div>
         <div class="flex-1 p-4">
-          <div class="mb-2 text-lg font-semibold">Upload the JSON credentials file you downloaded from the previous step here</div>
+          <div class="mb-5 text-xl font-semibold">Upload the JSON credentials file you downloaded from the previous step here</div>
           <div class="font-semibold3  text-slate-800 my-10">
             <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
               <div class="mb-4">

@@ -27,7 +27,7 @@ Back to Dashboard</a>
     
           {"label": "Setup", "page": "google_drive_setup.php"},
           {"label": "Schedule", "page": "schedule.php"},
-          {"label": "Location", "page": "drive_settings.php"}      ]';
+          {"label": "Name & Location", "page": "drive_settings.php"}      ]';
 
           // Decoding the JSON string into an array
       $tabsArray = json_decode($tabs, true);

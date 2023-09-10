@@ -41,22 +41,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
-
-
-
     <title>Backup File Name Configuration</title>
     <script>
         function updatePreview() {
-            const currentDate = (new Date()).toISOString().slice(0, 10);
-            const currentTime = (new Date()).toLocaleTimeString().replace(/:/g, '-').replace(/\s/g, '');
+            // date('h-ia-T')
+            // date('j-F-Y-l')
+            const currentDate = "<?php echo date('j-F-Y-l'); ?>";
+            const currentTime = "<?php echo date('h-ia-T'); ?>";
             const databaseName = "<?php $config = include 'config.php'; echo $config['db_name']; ?>";
             const template = document.getElementById('backup_file_name').value;
-            const folderName = document.getElementById('folder_name').value;
+            var folderName = document.getElementById('folder_name').value;
 
             let preview = template
                 .replace('{date}', currentDate)
                 .replace('{time}', currentTime)
                 .replace('{database_name}', databaseName);
+
+            // replace placeholders
+            folderName = folderName
+                .replace('{date}', currentDate)
+                .replace('{time}', currentTime)
+                .replace('{database_name}', databaseName);
+
 
             if (folderName.trim() !== '' && document.getElementById('upload_to_folder').checked) {
                 preview = folderName + '/' + preview;

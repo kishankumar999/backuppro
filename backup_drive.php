@@ -1,4 +1,5 @@
 <?php
+include("generate_backup_file_name.php");
 ini_set('memory_limit', '1000M');
 ini_set('max_execution_time', 60 * 10); //10 minutes
 if (!isset($dont_check_login) || $dont_check_login != true) {
@@ -196,22 +197,7 @@ flush(); // Send the HTML content to the browser immediately
 $service = new Google_Service_Drive($client);
 
 
-function generateBackupFileName($template)
-{
-    $currentDate = date('Y-m-d');
-    // current time in 12 hour format with AM/PM separated by - 
-    $currentTime = date('h-i-sA');
-    // getting datbase name from config.php
-    $config = include(__DIR__ . DIRECTORY_SEPARATOR . 'config.php');
-    $databaseName = $config['db_name'];
 
-    // Replace placeholders in the template with actual values
-    $backupFileName = str_replace('{date}', $currentDate, $template);
-    $backupFileName = str_replace('{time}', $currentTime, $backupFileName);
-    $backupFileName = str_replace('{database_name}', $databaseName, $backupFileName);
-
-    return $backupFileName . '.zip'; // Add .zip extension to the file name
-}
 
 
 function generateFolderName($foldername)
