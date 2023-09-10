@@ -89,8 +89,6 @@ if (strpos($output, 'ERROR: The system cannot find the file specified.') !== fal
                     <option value="daily">Daily</option>
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
-                    <option value="startup">When Computer Starts</option>
-                    <option value="logon">When I Log On</option>
                 </select>
             </div>
 
