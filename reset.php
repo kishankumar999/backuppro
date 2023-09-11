@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <path fill-rule="evenodd" d="M7.293 5.293a1 1 0 0 1 0 1.414L4.414 10H16a1 1 0 1 1 0 2H4.414l2.879 2.293a1 1 0 1 1-1.414 1.414l-4-4a1 1 0 0 1 0-1.414l4-4a1 1 0 0 1 1.414 0z" clip-rule="evenodd"></path>
     </svg>
 Back to Dashboard</a>
-  <div class="container mx-auto max-w-xl py-10">
+  <div class="container mx-auto max-w-xl py-10 ">
     <div class="bg-white p-6 rounded">
       <h1 class="text-2xl mb-4">Reset to Default</h1>
       <p class="mb-6">All settings will be lost and you will be redirected to the Setup wizard.</p>

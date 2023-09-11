@@ -91,7 +91,10 @@ $zipFile = __DIR__ . DIRECTORY_SEPARATOR .'backup.zip';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Backup Progress</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+    
+     <!-- <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script> -->
+     <!-- include css/output.css -->
+    <link rel="stylesheet" href="css/output.css">
 </head>
 <body class="bg-gray-100 flex flex-col items-center justify-center h-screen">
     <div class="flex gap-2 my-5">

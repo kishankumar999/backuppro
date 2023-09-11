@@ -1,5 +1,7 @@
 # Ignoring vendor
 vendor/
+# Ignore node_modules
+node_modules/
 # Ignore uploads uploads/*.json
 uploads/*.json
 # Ignore uploads uploads/*.json

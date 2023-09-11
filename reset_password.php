@@ -33,7 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+     <!-- <link rel="stylesheet" href="css/output.css"> -->
+     <!-- include css/output.css -->
+     <link rel="stylesheet" href="css/output.css">
 </head>
 
 <body class="bg-gray-100" >
@@ -43,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <path fill-rule="evenodd" d="M7.293 5.293a1 1 0 0 1 0 1.414L4.414 10H16a1 1 0 1 1 0 2H4.414l2.879 2.293a1 1 0 1 1-1.414 1.414l-4-4a1 1 0 0 1 0-1.414l4-4a1 1 0 0 1 1.414 0z" clip-rule="evenodd"></path>
     </svg>
 Back to Dashboard</a>
-<div class="flex items-center justify-center min-h-screen ">
+<div class="flex items-center justify-center min-h-[calc(100vh-60px)] ">
     
 
     <div class="max-w-sm p-6 bg-white rounded shadow-md">

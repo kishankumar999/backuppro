@@ -28,7 +28,9 @@ $backupTime = isset($config['backup_time']) ? $config['backup_time'] : '';
 <html>
 <head><?php include("favicon.php"); ?>
     <title>Backup Frequency Setup</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+     <!-- <link rel="stylesheet" href="css/output.css"> -->
+     <!-- include css/output.css -->
+     <link rel="stylesheet" href="css/output.css">
 </head>
 <body class="bg-gray-50">
    

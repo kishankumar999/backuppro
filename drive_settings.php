@@ -40,7 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head><?php include("favicon.php"); ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+   
+     <!-- <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script> -->
+     <!-- include css/output.css -->
+    <link rel="stylesheet" href="css/output.css">
     <title>Backup File Name Configuration</title>
     <script>
         function updatePreview() {

@@ -19,4 +19,13 @@ Backup Pro - MySQL Automated backups to Google Drive.
 ![localhost_backuppro_setup php](https://github.com/shishirraven/backuppro/assets/4470383/9bb880c6-4309-4442-a449-268ddf890ae8)
 
 
+## Development - How to Rebuild the output.css 
+
+We use tailwind CSS in this project. To rebuild it use the following command. 
+
+```
+npx tailwindcss -i input.css -o ./css/output.css --watch
+```
+
+
 
