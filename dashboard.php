@@ -94,10 +94,14 @@ $config = include('config.php');
 
 
         </div>
+
+  
+
         <?php 
         if (isset($config['last_backup_timestamp']) && $config['last_backup_timestamp'] != "") {?>
         <!-- in a muted color display last_backup_timestamp from config in a human readable format show like 7th July 2023 at 12:00 pm -->
-        <div class="bg-gray-100 rounded p-4 my-8">
+        <div class=" bg-white px-6 my-8 pt-10 pb-8 ring-1 ring-gray-900/5   sm:rounded-lg sm:px-10">
+  
             <h2 class="text-xl font-bold mb-4">Last Backup to Google Drive</h2>
             <p class="text-gray-500">
                 <?php if (isset($config['last_backup_timestamp']) && $config['last_backup_timestamp'] != "") : ?>

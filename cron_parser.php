@@ -1,4 +1,45 @@
 <?php
+
+function modifyMinutes($currentMinute, $minutesToModify, $operation) {
+    // Ensure $currentMinute is in the range [0-59]
+    if ($currentMinute < 0 || $currentMinute > 59) {
+        throw new InvalidArgumentException("Current minute must be in the range [0-59]");
+    }
+    
+    if ($operation === '+') {
+        // Add minutes
+        $newMinute = ($currentMinute + $minutesToModify) % 60;
+    } elseif ($operation === '-') {
+        // Subtract minutes
+        $newMinute = ($currentMinute - $minutesToModify + 60) % 60;
+    } else {
+        throw new InvalidArgumentException("Invalid operation. Use '+' or '-'");
+    }
+    
+    return $newMinute;
+}
+
+function modifyHour($currentHour, $hoursToModify, $operation) {
+    // Ensure $currentHour is in the range [0-23]
+    if ($currentHour < 0 || $currentHour > 23) {
+        throw new InvalidArgumentException("Current hour must be in the range [0-23]");
+    }
+    
+    if ($operation === '+') {
+        // Add hours
+        $newHour = ($currentHour + $hoursToModify) % 24;
+    } elseif ($operation === '-') {
+        // Subtract hours
+        $newHour = ($currentHour - $hoursToModify + 24) % 24;
+    } else {
+        throw new InvalidArgumentException("Invalid operation. Use '+' or '-'");
+    }
+    
+    return $newHour;
+}
+
+
+
 class CronScheduler {
     private $currentDate;
     
@@ -36,7 +77,9 @@ class CronScheduler {
                 $nextTimeCandidate->modify('+1 minute');
             }
 
-            $nextTimes[] = new DateTime($nextTimeCandidate->format('Y-m-d H:i:s'));
+            //
+
+            $nextTimes[] = new DateTime($nextTimeCandidate->format('Y-m-d H:i:s '));
             $nextTimeCandidate->modify('+1 minute');
         }
 

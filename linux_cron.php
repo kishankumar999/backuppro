@@ -1,4 +1,11 @@
 <?php
+include 'validate_login.php';
+// if linux
+$phpPath ="php";
+if (PHP_OS === 'Linux') {
+// $phpPath = exec("which php");
+}
+
 include("cron_parser.php");
 
 function hasShellAccess()
@@ -28,15 +35,16 @@ function hasCronTabForCommand($commandToCheck)
 
 function updateCronTab($newCommand)
 {
+    global $phpPath;
     // Validate if the command is a valid cron job command and contains "php"
-    if (strpos($newCommand, 'php') !== false && preg_match('/^\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+.+$/', $newCommand)) {
+    if (strpos($newCommand, $phpPath) !== false && preg_match('/^\S+\s+\S+\s+\S+\s+\S+\s+\S+\s+.+$/', $newCommand)) {
 
         // Read the existing cron tab
         exec('crontab -l', $currentCronTab);
 
         // print_r($cursrentCronTab);
 
-        $pathOfNewCommand = explode("php", $newCommand, 2)[1]; // Get the path of the new command
+        $pathOfNewCommand = explode($phpPath, $newCommand, 2)[1]; // Get the path of the new command
 
         // Filter out existing commands with the same path as the new command
         $filteredCronTab = array_filter($currentCronTab, function ($line) use ($pathOfNewCommand) {
@@ -74,9 +82,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head><?php include("favicon.php"); ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   
-     <!-- <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script> -->
-     <!-- include css/output.css -->
+
+    <!-- <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script> -->
+    <!-- include css/output.css -->
     <link rel="stylesheet" href="css/output.css">
     <title>Backup Scheduler: Linux (Cron Job)</title>
 </head>
@@ -98,11 +106,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 It will also expain what the command is doing and when it will be executed. And also next 5 times when it will be executed.
             </p>
 
-           
+            <?php
+                $offset = date('P');
+                $original_operation = $offset[0]; // Extract the operation (+ or -)
+                $operation = $offset[0]; // Extract the operation (+ or -)\
+                // flip the operation
+                if ($operation == "+") {
+                    $operation = "-";
+                } else {
+                    $operation = "+";
+                }
+                $time_parts = explode(':', substr($offset, 1)); // Split the remaining part (05:30) by :
+                
+                $hours = (int)$time_parts[0]; // Extract hours as an integer
+                $minutes = (int)$time_parts[1]; // Extract minutes as an integer
+                
+                ?>
+
             <?php if (hasShellAccess()) { ?>
                 <p class="">
                     <?php
-                    $commandToCheck = "php " . __DIR__ . DIRECTORY_SEPARATOR . "cron.php";
+                    $commandToCheck = $phpPath." " . __DIR__ . DIRECTORY_SEPARATOR . "cron.php";
                     $command_there = hasCronTabForCommand($commandToCheck);
                     if ($command_there) {
                         //secho "Cron tab is set for the command: $commandToCheck";
@@ -122,74 +146,81 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                         // Output parsed components
                         // echo "Minute: $minute\n";
-                        // echo "Hour: $hour\n";
+                        // echo "Hour: $hour\n"; 
                         // echo "Day of Month: $dayOfMonth\n";
                         // echo "Month: $month\n";
                         // echo "Day of Week: $dayOfWeek\n";
                         // echo "Command: $command\n";
 
                         $cronScheduler = new CronScheduler();
-$nextTimes = $cronScheduler->generateNextTimes($minute, $hour, $dayOfMonth, $month, $dayOfWeek, 5);
 
-?>
-<div class="bg-white px-6 pb-8 pt-5 shadow-xl">
-  <p class="mb-3 text-3xl">Current Backup Schedule</p>
-    
+                        // add the offset to the hours and minutes
+                        $hour = modifyHour($hour, $hours,  $original_operation);
+                        $minute = modifyMinutes($minute, $minutes,  $original_operation);
+                        
+                        $nextTimes = $cronScheduler->generateNextTimes($minute, $hour, $dayOfMonth, $month, $dayOfWeek, 5);
 
-  <p class="mb-3 mt-6 text-lg">5 Next backup dates.</p>
-  <ul class="flex flex-col gap-3">
-   
- 
-  
-<?php
-foreach($nextTimes as $nextTime) {
-    ?>
-     <li>
-      <div class="flex items-center gap-2">
-        <svg class="w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="nz sb axp"><path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd"></path></svg>
-        <div class="text-lg">
-            <?php echo date("l F j, Y, h:i A", $nextTime->getTimestamp()) . "\n"; ?>
-        </div>
-      </div>
-      <div class="font-bold2 ml-6 text-sm text-gray-600">
-        <?php echo getRelativeTime($nextTime->format('Y-m-d H:i:s')) . "\n"; ?>    
-    </div>
-    </li>
-    <?php
-    
-    
-}?>
-</ul>
-</div>
+                    ?>
+                <div class="bg-white px-6 pb-8 pt-5 shadow-xl">
+                    <p class="mb-3 text-3xl">Current Backup Schedule</p>
 
-<div class="bg-gray-200 text-gray-500 p-4 text-base text-sm">
 
-    <?php echo  $command_there ; ?>
- 
+                    <p class="mb-3 mt-6 text-lg">5 Next backup dates.</p>
+                    <ul class="flex flex-col gap-3">
 
-</div>
-<?php
+
+
+                        <?php
+                        foreach ($nextTimes as $nextTime) {
+                        ?>
+                            <li>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="nz sb axp">
+                                        <path fill-rule="evenodd" d="M5.75 2a.75.75 0 01.75.75V4h7V2.75a.75.75 0 011.5 0V4h.25A2.75 2.75 0 0118 6.75v8.5A2.75 2.75 0 0115.25 18H4.75A2.75 2.75 0 012 15.25v-8.5A2.75 2.75 0 014.75 4H5V2.75A.75.75 0 015.75 2zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <div class="text-lg">
+                                        <?php echo date("l F j, Y, h:i A T", $nextTime->getTimestamp()) . "\n"; ?>
+                                    </div>
+                                </div>
+                                <div class="font-bold2 ml-6 text-sm text-gray-600">
+                                    <?php echo getRelativeTime($nextTime->format('Y-m-d H:i:s ')) . "\n"; ?>
+                                </div>
+                            </li>
+                        <?php
+
+
+                        } ?>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-200 text-gray-500 p-4 text-base text-sm">
+
+                    <?php echo  $command_there; ?>
+
+
+                </div>
+            <?php
                     } else {
                         echo "No cron tab found for the command: <br><code> $commandToCheck </code>";
                     }
 
-                    ?>
-                </p>
-            <?php } ?>
-
-
-
-            <p class="bg-yellow-100 py-1 px-2">
-                <?php
-
-
-                if (hasShellAccess()) {
-                    echo "✔ This script has shell access.";
-                } else {
-                    echo "⚠ This script does not have shell access. <br> You will have to setup the CRON Job manually.";
-                }
-                ?>
+            ?>
             </p>
+        <?php } ?>
+
+
+
+        <p class="bg-yellow-100 py-1 px-2">
+            <?php
+
+
+            if (hasShellAccess()) {
+                echo "✔ This script has shell access.";
+            } else {
+                echo "⚠ This script does not have shell access. <br> You will have to setup the CRON Job manually.";
+            }
+            ?>
+        </p>
 
         </div>
         <div class="bg-white prose p-6 rounded shadow md:w-1/2 my-10">
@@ -200,18 +231,20 @@ foreach($nextTimes as $nextTime) {
             <div class="grid grid-cols-2 gap-4 mb-4">
 
                 <label class="block mb-2" for="minute">Minute</label>
+             
                 <select id="minute" class="w-full  mb-2 px-2 py-1 border rounded">
                     <option value="*">*</option>
                     <?php
                     for ($i = 0; $i <= 59; $i++) {
-                        if(isset($minute) && $minute == $i) {
+                        if (isset($minute) && $minute == $i) {
                             $selected = "selected=\"selected\"";
                         } else {
                             $selected = "";
                         }
+                        // modify minite
+                        $local_timezone_minute = modifyMinutes($i, $minutes, $operation);
 
-                
-                        echo "<option   $selected  value=\"$i\">$i</option>";
+                        echo "<option   $selected  value=\"$local_timezone_minute\">$i</option>";
                     }
                     ?>
                 </select>
@@ -220,13 +253,26 @@ foreach($nextTimes as $nextTime) {
                 <select id="hour" class="w-full  mb-2 px-2 py-1 border rounded">
                     <option value="*">*</option>
                     <?php
+
+
+
+//echo "Operation: $operation, Hours: $hours, Minutes: $minutes";
+
+
                     for ($i = 0; $i <= 23; $i++) {
-                        if(isset($hour) && $hour == $i) {
+                        if (isset($hour) && $hour == $i) {
                             $selected = "selected=\"selected\"";
                         } else {
                             $selected = "";
                         }
-                        echo "<option  $selected value=\"$i\">$i</option>";
+
+                        
+
+                        // get the gmt time difference in current timezone 
+
+                        $local_timezone_hour = modifyHour($i, $hours, $operation);
+
+                        echo "<option  $selected value=\"$local_timezone_hour\">$i</option>";
                     }
                     ?>
                 </select>
@@ -236,7 +282,7 @@ foreach($nextTimes as $nextTime) {
                     <option value="*">*</option>
                     <?php
                     for ($i = 1; $i <= 31; $i++) {
-                        if(isset($dayOfMonth) && $dayOfMonth == $i) {
+                        if (isset($dayOfMonth) && $dayOfMonth == $i) {
                             $selected = "selected=\"selected\"";
                         } else {
                             $selected = "";
@@ -265,7 +311,7 @@ foreach($nextTimes as $nextTime) {
                 <select id="dayOfWeek" class="w-full  mb-2 px-2 py-1 border rounded">
                     <option value="*">*</option>
                     <?php
-                    if(isset($dayOfWeek) && $dayOfWeek == $i) {
+                    if (isset($dayOfWeek) && $dayOfWeek == $i) {
                         $selected = "selected=\"selected\"";
                     } else {
                         $selected = "";
@@ -299,12 +345,65 @@ foreach($nextTimes as $nextTime) {
         </div>
     </div>
     <script>
+        function modifyMinutes(currentMinute, minutesToModify, operation) {
+    // Ensure currentMinute is in the range [0-59]
+    console.log(currentMinute)
+    if(currentMinute == "*")
+    {
+        return "*";
+    }
+
+    currentMinute = parseInt(currentMinute);
+    minutesToModify = parseInt(minutesToModify);
+
+    if (currentMinute < 0 || currentMinute > 59) {
+        throw new Error("Current minute must be in the range [0-59]");
+    }
+
+    if (operation === '+') {
+        // Add minutes
+        let newMinute = (currentMinute + minutesToModify) % 60;
+        return newMinute;
+    } else if (operation === '-') {
+        // Subtract minutes
+        let newMinute = (currentMinute - minutesToModify + 60) % 60;
+        return newMinute;
+    } else {
+        throw new Error("Invalid operation. Use '+' or '-'");
+    }
+}
+
+function modifyHour(currentHour, hoursToModify, operation) {
+    if(currentHour == "*")
+    {
+        return "*";
+    }
+
+    currentHour = parseInt(currentHour);
+    hoursToModify = parseInt(hoursToModify);
+    // Ensure currentHour is in the range [0-23]
+    if (currentHour < 0 || currentHour > 23) {
+        throw new Error("Current hour must be in the range [0-23]");
+    }
+
+    if (operation === '+') {
+        // Add hours
+        let newHour = (currentHour + hoursToModify) % 24;
+        return newHour;
+    } else if (operation === '-') {
+        // Subtract hours
+        let newHour = (currentHour - hoursToModify + 24) % 24;
+        return newHour;
+    } else {
+        throw new Error("Invalid operation. Use '+' or '-'");
+    }
+}
         document.addEventListener("DOMContentLoaded", function() {
             const commandToRun = '<?php
                                     // escape string for use in javascript
 
 
-                                    echo  str_replace("\\", "\\\\", " php " . __DIR__ . DIRECTORY_SEPARATOR . "cron.php");
+                                    echo  str_replace("\\", "\\\\", " ".$phpPath." " . __DIR__ . DIRECTORY_SEPARATOR . "cron.php");
                                     ?>'
             const generateBtn = document.getElementById("generateBtn");
             const explanation = document.getElementById("explanation");
@@ -315,19 +414,40 @@ foreach($nextTimes as $nextTime) {
             const monthInput = document.getElementById("month");
             const dayOfWeekInput = document.getElementById("dayOfWeek");
 
+            
+
+            // set offset on the minutes and hours
+            const minutes = <?php echo $minutes; ?>;
+            const hours = <?php echo $hours; ?>;
+            const operation = "<?php echo $original_operation; ?>";
+
+
             // on change of input with class w-full run the function
 
             document.querySelectorAll(".w-full").forEach((input) => {
                 input.addEventListener("change", function() {
-                    const minute = minuteInput.value;
-                    const hour = hourInput.value;
+                    
+            // modify the minutes and hours
+
+            var originalminute= minuteInput.value;
+            var originalhour= hourInput.value;
+    
+        
+                     const minute = ""+ modifyMinutes(minuteInput.value, minutes, operation);
+                     const hour = ""+modifyHour(hourInput.value, hours, operation);
+                    // const minute = minuteInput.value;
+                    // const hour = hourInput.value;
+                    console.log("minutes: ",minute,modifyMinutes(minuteInput.value, minutes, operation));
+                    console.log("hours: ",hour,modifyHour(hourInput.value, hours, operation));
+              
+                    console.log(hour)
                     const dayOfMonth = dayOfMonthInput.value;
                     const month = monthInput.value;
-                    const dayOfWeek = dayOfWeekInput.value==7?"0":dayOfWeekInput.value;
+                    const dayOfWeek = dayOfWeekInput.value == 7 ? "0" : dayOfWeekInput.value;
                     console.log(dayOfWeek);
-                    
 
-                    const command = `${minute} ${hour} ${dayOfMonth} ${month} ${dayOfWeek}`;
+
+                    const command = `${originalminute} ${originalhour} ${dayOfMonth} ${month} ${dayOfWeek}`;
                     generatedCommand.textContent = command + commandToRun;
 
                     // also update it on input with id new_command
@@ -392,6 +512,13 @@ foreach($nextTimes as $nextTime) {
                         second: 'numeric',
                         timeZoneName: 'short'
                     };
+
+                    // convert time to local time
+
+                    
+
+
+                    
 
                     listItem.textContent = time.toLocaleString('en-US', options);
                     nextTimesList.appendChild(listItem);
