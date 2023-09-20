@@ -1,5 +1,5 @@
 <?php
-
+require_once 'vendor/autoload.php';
 function modifyMinutes($currentMinute, $minutesToModify, $operation) {
     // Ensure $currentMinute is in the range [0-59]
     if ($currentMinute < 0 || $currentMinute > 59) {
@@ -55,6 +55,21 @@ class CronScheduler {
     }
     
     public function generateNextTimes($minute, $hour, $dayOfMonth, $month, $dayOfWeek, $count) {
+
+        $nextTimes = [];
+        $cron = new Cron\CronExpression($minute . " " . $hour . " " . $dayOfMonth . " " . $month . " " . $dayOfWeek);
+
+        // loop through the count
+        for ($i = 1; $i <= $count; $i++) {
+            echo $cron->getNextRunDate(null, $i)->format('Y-m-d H:i:s') . "\n";
+            // get environment timezone in php
+            
+
+            $nextTimes[] =   new DateTime( $cron->getNextRunDate(null, $i)->format('Y-m-d H:i:s T'));
+        }
+        return $nextTimes;
+    }
+    public function generateNextTimes2($minute, $hour, $dayOfMonth, $month, $dayOfWeek, $count) {
         $minutes = $this->parseCronComponent($minute, 59);
         $hours = $this->parseCronComponent($hour, 23);
         $daysOfMonth = $this->parseCronComponent($dayOfMonth, 31);
@@ -88,6 +103,30 @@ class CronScheduler {
 
   
 }
+function hasCronTabForCommand($commandToCheck)
+{
+    $existingCronTabs = shell_exec('crontab -l');
+    if(!$existingCronTabs)
+    {
+        return false;
+    }
+    $lines = explode("\n", $existingCronTabs);
+
+    foreach ($lines as $line) {
+        // Skip empty lines and comments
+        if (trim($line) === '' || strpos(trim($line), '#') === 0) {
+            continue;
+        }
+
+        // Check if the line contains the command to check
+        if (strpos($line, $commandToCheck) !== false) {
+            return $line;
+        }
+    }
+
+    return false;
+}
+
 
 function getRelativeTime($originalDatetimeString) {
     // Convert the input datetime string to a DateTime object
