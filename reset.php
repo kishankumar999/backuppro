@@ -10,6 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
     }
 
+    // Set subscribers.json as []
+    $subscribersFile = 'subscribers.json';
+    file_put_contents($subscribersFile, '[]');
+
+
     // Delete token.json from the root folder
     $tokenFile = 'token.json';
     if (is_file($tokenFile)) {

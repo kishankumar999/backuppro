@@ -173,7 +173,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                         <?php
                         if (isset($command_schedule_expression)) {
-                            echo $command_schedule_expression;
+                            //echo $command_schedule_expression;
                         }
 
                         ?>
@@ -488,7 +488,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         console.log('This will run every fifth second');
                     });
                     const nextTimes = Cron(minute + " " + hour + " " + dayOfMonth + " " + month + " " + dayOfWeek, {
-                        timezone: 'America/Nassau'
+                        timezone: <?php echo '"' . $original_timezone_b . '"'; ?>
                     }).nextRuns(3);
                     // const nextTimes = Cron(minute +" " +hour +" " + dayOfMonth +" " + month +" " + dayOfWeek,{ timezone: 'America/Los_Angeles' }).nextRuns(3);
                     renderNextTimes(nextTimes);
@@ -503,7 +503,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 nextTimesList.innerHTML = "";
                 nextTimes.forEach((time) => {
                     const listItem = document.createElement("li");
-                    listItem.textContent = time.toLocaleString();
+                //     listItem.textContent = time.toLocaleString();
 
                     const options = {
                         weekday: 'long',
@@ -525,7 +525,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 
-                    // listItem.textContent = time.toLocaleString('en-US', options);
+                    listItem.textContent = time.toLocaleString('en-US', options);
                     nextTimesList.appendChild(listItem);
                 });
             }

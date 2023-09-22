@@ -1,4 +1,5 @@
 <?php
+include("validate_login.php");
         // Function to read subscribers from JSON file
         function readSubscribers() {
             $file = 'subscribers.json';

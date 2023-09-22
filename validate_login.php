@@ -5,11 +5,17 @@ $config = include('config.php');
 
 if (isset($config['timezone'])) 
 {
+    $original_timezone_b= date_default_timezone_get();
     date_default_timezone_set($config['timezone']);
+    // echo date_default_timezone_get();
 } else {
     date_default_timezone_set('Asia/Kolkata');
 }
+
+// set a unique session name base on unique_application_name inside config 
+session_name($config['unique_application_name']);
 session_start();
+
 
 // Check if the session is not set
 if (!isset($_SESSION['username'])) {

@@ -1,4 +1,6 @@
 <?php
+
+include 'validate_login.php';
 // if linux
 $phpPath = "php";
 if (PHP_OS === 'Linux') {

@@ -1,5 +1,4 @@
 <?php
-session_start();
 if (isset($_SESSION['username'])) {
     // Redirect to the dashboard
     header('Location: dashboard.php');
@@ -19,6 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($username === $config['dashboard_username'] && $password === $config['dashboard_password']) {
         // Valid credentials, create session
+        
+session_name($config['unique_application_name']);
+session_start();
         $_SESSION['username'] = $username;
         $_SESSION['setup_name'] = $config['setup_name'];
 

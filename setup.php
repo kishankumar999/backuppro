@@ -5,8 +5,6 @@ if (file_exists('config.php')) {
     exit();
 }
 
-
-session_start();
 $error = false;
 $error_not_writable = false;
 $configFilePath = 'config.php';
@@ -29,6 +27,8 @@ if (!$writable) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Step 1: Process the form submission
+
+    
     $dbHost = $_POST['db_host'];
     $dbName = $_POST['db_name'];
     $dbUsername = $_POST['db_username'];
@@ -83,7 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'backup_folder' => 'backups',
             'backup_file_name' => '{database_name}-{date}-{time}',
             'redirect_url' => $currentURL, 
-            'timezone' => $_POST['timezone']
+            'timezone' => $_POST['timezone'], 
+            'unique_application_name' => uniqid()
         );
 
         // Step 3.5: Find mysqldump path
@@ -116,6 +117,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (file_put_contents($configFilePath, $configContent) !== false) {
             // Step 5: Installation successful
                  // Valid credentials, create session
+                 
+session_name($config['unique_application_name']);
+session_start();
                 $_SESSION['username'] = $dashboardUsername;
                 $_SESSION['setup_name'] ="";
             header('Location: dashboard.php?installation_complete=true'); // Redirect to the application or next step
@@ -142,6 +146,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body class="bg-gray-100 md:p-4">
+
+    <?php 
+            include("check_permissions.php"); 
+            ?>
+
+
     <div class="grid md:grid-cols-3 gap-3 max-w-xl md:max-w-full grid bg-white p-5 md:p-10  mx-auto  ">
         <div>
             <div class="flex gap-1 ">
@@ -153,6 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <h1 class="text-2xl font-bold my-5">Installation</h1>
+            
             <?php if (!$writable) : ?>
                 <div class="bg-yellow-300 text-black my-5 px-4 py-2">
                     <p class="text-lg my-2">Make BackupPro folder writeable </p>
