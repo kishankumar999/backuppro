@@ -24,7 +24,14 @@ $config = include(__DIR__ . DIRECTORY_SEPARATOR . 'config.php');
 // Set up the Google API client
 $client = new Google_Client();
 $client->setApplicationName('BackupPro');
-$client->setScopes(Google_Service_Drive::DRIVE);
+// $client->setScopes(Google_Service_Drive::DRIVE);
+
+// set scope .../auth/drive.appdata
+//$client->addScope(Google_Service_Drive::DRIVE_APPDATA);
+
+// set scope .../auth/drive.file
+$client->addScope(Google_Service_Drive::DRIVE_FILE);
+
 $client->addScope(Google_Service_Gmail::GMAIL_SEND);
 // add scope for people api
 $client->addScope(Google_Service_PeopleService::USERINFO_EMAIL);

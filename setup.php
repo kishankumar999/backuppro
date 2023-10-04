@@ -106,6 +106,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // if linux server checked mysqldump path from which command. 
+        if (empty($mysqldumpPath) && strpos($platform, 'WIN') !== 0) {
+            $mysqldumpPath = trim(shell_exec('which mysqldump'));
+        }
+
+        // if windows 
+        if (empty($mysqldumpPath) && strpos($platform, 'WIN') === 0) {
+            $mysqldumpPath = trim(shell_exec('where mysqldump'));
+        }
         // Add mysqldump path to the config
         $config['mysqldump_path'] = $mysqldumpPath;
 

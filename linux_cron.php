@@ -105,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <div class="flex items-center justify-center min-h-[calc(100vh-60px)] ">
        
-        <div class="m-10 max-w-3xl grow rounded-lg shadow-lg md:flex bg-white ring-1 ring-gray-900/5 ">
+        <div class="m-10 max-w-4xl grow rounded-lg shadow-lg md:flex bg-white ring-1 ring-gray-900/5 ">
             <div class="shrink-0 rounded-t-lg bg-gray-100 p-8 md:w-64 md:rounded-l-lg md:rounded-tr-none flex md:block flex-row-reverse gap-5">
                 <div class="">
 
@@ -283,7 +283,68 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 </div>
                 <div id="next3runs" class="hidden">
-                    <h3 class="block mb-2">Next 3 Runs</h3>
+                    <h3 class="block mt-10 font-semibold">Next 3 runs</h3>
+                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-8 mt-3 ">
+    <table class="w-full text-sm text-left text-gray-500 ">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50  ">
+            <tr>
+                <th scope="col" class="px-6 py-3">
+                    Timezone
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    1st Run
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    2nd Run
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    3rd Run
+                </th>
+                
+            </tr>
+        </thead>
+        <tbody id="nexttimebody">
+            <tr class="bg-white border-b  ">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
+                    <div>Asia/kolkata</div>  
+                    <div>(Your Tmezone)</div>
+                </th>
+                <td class="px-6 py-4">
+                 <div class="text-sm">September 26, 2023</div> 
+                 <div class="text-lg mt-2"> 1:30:00 AM </div> 
+                </td>
+                <td class="px-6 py-4">
+                 <div class="text-sm">September 26, 2023</div> 
+                 <div class="text-lg mt-2"> 1:30:00 AM </div> 
+                </td>
+                <td class="px-6 py-4">
+                 <div class="text-sm">September 26, 2023</div> 
+                 <div class="text-lg mt-2"> 1:30:00 AM </div> 
+                </td>
+            </tr>
+            <tr class="bg-white border-b  ">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">
+                    asia/kolkata
+                </th>
+                <td class="px-6 py-4">
+                 <div class="text-sm">September 26, 2023</div> 
+                 <div class="text-lg mt-2"> 1:30:00 AM </div> 
+                </td>
+                <td class="px-6 py-4">
+                 <div class="text-sm">September 26, 2023</div> 
+                 <div class="text-lg mt-2"> 1:30:00 AM </div> 
+                </td>
+                <td class="px-6 py-4">
+                 <div class="text-sm">September 26, 2023</div> 
+                 <div class="text-lg mt-2"> 1:30:00 AM </div> 
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+
                     <ul id="nextTimesList" class="list-disc list-inside mt-2 text-gray-600"></ul>
                 </div>
 
@@ -383,6 +444,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             const generateBtn = document.getElementById("generateBtn");
             const explanation = document.getElementById("explanation");
             const nextTimesList = document.getElementById("nextTimesList");
+            const nexttimeBody = document.getElementById("nexttimebody");
             const minuteInput = document.getElementById("minute");
             const hourInput = document.getElementById("hour");
             const dayOfMonthInput = document.getElementById("dayOfMonth");
@@ -478,8 +540,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     document.getElementById("new_command").value = command + commandToRun;
 
                     // const readableExplanation = generateExplanation(minute, hour, dayOfMonth, month, dayOfWeek);
-
-                    const readableExplanation = cronstrue.toString(minute + " " + hour + " " + dayOfMonth + " " + month + " " + dayOfWeek);
+k nhgfng(minute + " " + hour + " " + dayOfMonth + " " + month + " " + dayOfWeek);
                     explanation.textContent = readableExplanation;
 
                     // const nextTimes = generateNextTimes(minute, hour, dayOfMonth, month, dayOfWeek, 3);
@@ -491,7 +552,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         timezone: <?php echo '"' . $original_timezone_b . '"'; ?>
                     }).nextRuns(3);
                     // const nextTimes = Cron(minute +" " +hour +" " + dayOfMonth +" " + month +" " + dayOfWeek,{ timezone: 'America/Los_Angeles' }).nextRuns(3);
-                    renderNextTimes(nextTimes);
+                    //renderNextTimes(nextTimes);
+                    renderNextTimesTable(nextTimes);
                 });
             });
 
@@ -513,7 +575,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         hour: 'numeric',
                         minute: 'numeric',
                         second: 'numeric',
-                        timeZoneName: 'short'
+                        timeZoneName: 'long'
                     };
 
                     // convert time to local time
@@ -528,6 +590,123 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     listItem.textContent = time.toLocaleString('en-US', options);
                     nextTimesList.appendChild(listItem);
                 });
+            }
+            function renderNextTimesTable(nextTimes) {
+                nexttimeBody.innerHTML = "";
+                // create a tr element  
+                 const tr = document.createElement("tr");
+                 // add class bg-white border-b 
+                    tr.classList.add("bg-white", "border-b");
+                 // td element 
+                    const td = document.createElement("th");
+                    td.classList.add("px-6", "py-4", "font-medium", "text-gray-900", "whitespace-nowrap");
+
+                    td.textContent = <?php echo '"' . date_default_timezone_get() . '"'; ?>;
+                    tr.appendChild(td);
+
+                nextTimes.forEach((time) => {
+                    const listItem = document.createElement("td");
+                    // add class px-6 py-4
+                    listItem.classList.add("px-6", "py-4");
+
+                    const options = {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric',
+                        timeZoneName: 'long'
+                    };
+
+                    options.timeZone = <?php echo '"' . date_default_timezone_get() . '"'; ?>;
+                    // convert time to local time
+                    // USER TIMEZZONE LIKE America/Nassau
+                    // const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                    
+                    // get just timezone
+                     const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                //    alert(userTimeZone);
+
+                    // get the Date as formatted "September 26, 2023" without time
+                    //listItem.textContent = time.toLocaleString('en-US', { timeZone: userTimeZone, ...options, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined });
+
+                    // create a div element with class class="text-sm" and append it to listItem
+                    const div = document.createElement("div");
+                    div.classList.add("text-sm");
+                    div.textContent = time.toLocaleString('en-US', { timeZone: userTimeZone, ...options, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined });
+                    listItem.appendChild(div);
+                    
+                    // create a div which has class text-lg and mt-2 which has text content as only time and append it to listItem
+                    const div2 = document.createElement("div");
+                    div2.classList.add("text-lg", "mt-2");
+                    div2.textContent = time.toLocaleString('en-US', { timeZone: userTimeZone, ...options, weekday: undefined, year: undefined, month: undefined, day: undefined, timeZoneName: undefined });
+                    
+                    listItem.appendChild(div2);
+                   // listItem.textContent = time.toLocaleString('en-US', options);
+
+
+                    tr.appendChild(listItem);
+                });
+                nexttimeBody.appendChild(tr);
+
+                const tr2 = document.createElement("tr");
+                 // td element 
+                 const td2 = document.createElement("th");
+                    td2.textContent = "Asia/Kolkata";
+                    td2.classList.add("px-6", "py-4", "font-medium", "text-gray-900", "whitespace-nowrap");
+
+                    td2.textContent = <?php echo '"' . $original_timezone_b . '"'; ?>;
+                    tr2.appendChild(td2);
+
+                nextTimes.forEach((time) => {
+                    const listItem = document.createElement("td");
+                    // add class px-6 py-4
+                    listItem.classList.add("px-6", "py-4");
+
+                    const options = {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+                        second: 'numeric',
+                        timeZoneName: 'long'
+                    };
+
+                    options.timeZone = <?php echo '"' . $original_timezone_b . '"'; ?>;
+                    // convert time to local time
+                    // USER TIMEZZONE LIKE America/Nassau
+                    // const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                    
+                    // get just timezone
+                     const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                //    alert(userTimeZone);
+
+                    // get the Date as formatted "September 26, 2023" without time
+                    //listItem.textContent = time.toLocaleString('en-US', { timeZone: userTimeZone, ...options, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined });
+
+                    // create a div element with class class="text-sm" and append it to listItem
+                    const div = document.createElement("div");
+                    div.classList.add("text-sm");
+                    div.textContent = time.toLocaleString('en-US', { timeZone: userTimeZone, ...options, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined });
+                    listItem.appendChild(div);
+                    
+                    // create a div which has class text-lg and mt-2 which has text content as only time and append it to listItem
+                    const div2 = document.createElement("div");
+                    div2.classList.add("text-lg", "mt-2");
+                    div2.textContent = time.toLocaleString('en-US', { timeZone: userTimeZone, ...options, weekday: undefined, year: undefined, month: undefined, day: undefined, timeZoneName: undefined });
+                    
+                    listItem.appendChild(div2);
+                   // listItem.textContent = time.toLocaleString('en-US', options);
+
+
+                    tr2.appendChild(listItem);
+                });
+                nexttimeBody.appendChild(tr2);
+
             }
 
             function parseCronComponent(component, maxValue) {
