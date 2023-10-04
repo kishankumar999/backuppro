@@ -9,4 +9,7 @@ token.json
 # ignore config.php
 config.php
 
+# igonore .zip 
+*.zip
+
 ```
