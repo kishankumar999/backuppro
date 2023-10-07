@@ -540,7 +540,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     document.getElementById("new_command").value = command + commandToRun;
 
                     // const readableExplanation = generateExplanation(minute, hour, dayOfMonth, month, dayOfWeek);
-k nhgfng(minute + " " + hour + " " + dayOfMonth + " " + month + " " + dayOfWeek);
+                    (minute + " " + hour + " " + dayOfMonth + " " + month + " " + dayOfWeek);
                     explanation.textContent = readableExplanation;
 
                     // const nextTimes = generateNextTimes(minute, hour, dayOfMonth, month, dayOfWeek, 3);
